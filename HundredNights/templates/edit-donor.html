@@ -1,0 +1,108 @@
+
+{% load tabindex from tag_extras %}
+{% load currency from tag_extras %}
+{% load bool_yn from tag_extras %}
+{% include "topmatter.html" %}
+
+<form method="post" action="">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="right">
+
+        {{ form.is_organization.errors }}
+        {{ form.is_organization|tabindex:7 }}
+        <label for="id_is_organization" style="display: inline;">
+        Is this an organization?</label>
+
+        <label for="id_email">Email:</label>
+        {{ form.email.errors }}
+        {{ form.email|tabindex:8 }}
+
+        <label for="id_organization_contact">Contact (for organization):</label>
+        {{ form.organization_contact.errors }}
+        {{ form.organization_contact|tabindex:9 }}
+
+        <div style="display: block;">
+            <a href="{% url 'donors' %}" style="margin-top: 15px" class="round-button">Back to List</a>
+            <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Donor" tabindex="10"/>
+        </div>
+    </div>
+    <div class="left">
+        <label for="id_name">Name:</label>
+        {{ form.name.errors }}
+        {{ form.name|tabindex:1 }}
+
+        <label for="id_title">Title:</label>
+        {{ form.title.errors }}
+        {{ form.title|tabindex:2 }}
+
+        <label for="id_street1">Street 1:</label>
+        {{ form.street_1.errors }}
+        {{ form.street_1|tabindex:3 }}
+
+        <label for="id_city">City:</label>
+        {{ form.city.errors }}
+        {{ form.city|tabindex:4 }}
+
+        <label for="id_zip">Zip:</label>
+        {{ form.zip.errors }}
+        {{ form.zip|tabindex:5 }}
+
+        <label for="id_state">State:</label>
+        {{ form.state.errors }}
+        {{ form.state|tabindex:6 }}
+
+    </div>
+</form>
+
+{% if form.instance.id %}
+<fieldset style="clear: both;"> 
+    <legend>Donations</legend>
+
+    <a href="{% url 'add-donation' form.instance.id %}" class="round-button">Add Donation</a>
+
+    <table class="donation-table">
+        <thead>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Monetary</th>
+            <th>Description</th>
+            <th>Comment</th>
+            <th></th>
+        </thead>
+        <tbody>
+       {% for donation in donations %}
+            <tr>
+                <td>{{ donation.date }}</td>
+                <td>{{ donation.amount|currency }}</td>
+                <td>{{ donation.monetary|bool_yn }}</td>
+                <td>{{ donation.description }}</td>
+                <td>{{ donation.comment }}</td>
+                <td>
+                    <a href="{% url 'edit-donation' form.instance.id donation.id %}">Edit</a> | 
+                    <a href="{% url 'delete-donation' donation.id %}">Delete</a>
+                </td>
+            </tr>
+       {% endfor %}
+   </tbody>
+</table>
+</fieldset>
+
+<script type="text/javascript">
+    var donation_table = $(".donation-table").dataTable({
+        "bLengthChange" : false,
+        "iDisplayLength": 1000,
+        "sDom": 'T<"clear">lfrtip',
+        "bFilter" : false,
+        "bPaginate" : false,
+        "bInfo" : false,
+        "oTableTools": {
+            "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+            "aButtons" : [ ]
+        }
+    });
+</script>
+{% endif %}
+
+{% include "footer.html" %}
+

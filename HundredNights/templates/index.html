@@ -1,0 +1,17 @@
+
+{% include "topmatter.html" %}
+
+<form method="POST" action="/upload-visitors" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="visitor-csv"></input>
+    <input type="submit"></input>
+</form>
+
+<form method="POST" action="/upload-donors" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="donor-csv"></input>
+    <input type="submit"></input>
+</form>
+
+{% include "footer.html" %}
+

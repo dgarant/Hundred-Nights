@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hundred Nights Database</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+        <!--[if lt IE 7]>
+            <link rel="stylesheet" type="text/css" href="/static/css/style-ie.css" />
+        <![endif]-->
+        <script type="text/javascript" src="/static/js/jquery.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="/static/js/TableTools.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.formset.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.uniform.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <link rel="stylesheet" type="text/css"href="/static/css/jquery.dataTables.css" />
+        <link rel="stylesheet" type="text/css"href="/static/css/TableTools.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/uniform.default.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/overcast/jquery-ui-1.10.3.custom.min.css" />
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if(typeof customExportTitle == "undefined") {
+                customExportTitle = document.title;
+            }
+
+            $(".data-table").dataTable({
+                "bLengthChange" : false,
+                "iDisplayLength": 100,
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+                    "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                    "aButtons" : [
+                        {
+                            "sExtends" : "xls",
+                            "sTitle" : customExportTitle
+                        },
+                        {
+                            "sExtends" : "pdf",
+                            "sTitle" : customExportTitle
+                        }
+                    ]
+                }
+            });
+
+            $("select, input[type=text], input[type=checkbox]").uniform();
+        });
+    </script>
+    </head>
+    <body>
+        <div id="page-wrap">
+            <div id="inside">
+                <div id="header">
+                    <a href="/"><img src="/static/images/hundrednights.png" /></a>
+                </div>
+                
+                <div id="left-sidebar">
+                    <ul>
+                        <li>
+                            <a href="/visit-log">Visitors</a>
+                        </li>
+                        <li>
+                            <a href="/volunteers">Volunteers</a>
+                        </li>
+                        <li>
+                            <a href="/donors">Donors</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div id="main-content">    

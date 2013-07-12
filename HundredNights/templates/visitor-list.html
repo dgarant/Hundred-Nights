@@ -1,0 +1,44 @@
+
+{% include "topmatter.html" %}
+
+<script type="text/javascript">
+    this.customExportTitle = "VisitorList";
+</script>
+
+<fieldset>
+    <legend>Visitors</legend>
+
+    <a href="/edit-visitor" class="add-link" >Add Visitor</a>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Town of Residence</th>
+                <th>Town of ID</th>
+                <th>Age</th>
+                <th>Veteran</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for visitor in visitors %}
+            <tr>
+                <td>{{visitor.name}}</td>
+                <td>{{visitor.town_of_residence}}</td>
+                <td>{{visitor.town_of_id}}</td>
+                <td>{{visitor.age | default_if_none:""}}</td>
+                {% if donor.veteran == True %}
+                    <td>Yes</td>
+                {% elif donor.veteran == False %}
+                    <td>No</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</fieldset>
+
+{% include "footer.html" %}
+
