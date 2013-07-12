@@ -17,7 +17,7 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': os.environ["HNIGHTS_DB_USER"],
         'PASSWORD': os.environ["HNIGHTS_DB_PASS"],
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': os.environ["HNIGHTS_DATABASE_URL"],                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
 }
