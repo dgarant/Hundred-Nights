@@ -1,0 +1,6 @@
+Django
+psycopg2
+gunicorn
+dj-database-url
+django-localflavor-us
+python-dateutil

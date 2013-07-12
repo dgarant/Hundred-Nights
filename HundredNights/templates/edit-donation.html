@@ -1,0 +1,58 @@
+
+{% load tabindex from tag_extras %}
+{% include "topmatter.html" %}
+
+<style type="text/css">
+    textarea#id_comment {
+        width: 250px;
+        height: 50px;
+    }
+    .right {
+        width: 75%;
+    }
+</style>
+<form method="post" action="">
+    {% csrf_token %}
+    <p style="font-weight: bold;">Donor: {{ donor.name }}</p>
+
+    {{ form.non_field_errors }}
+    {{ form.donor }}
+
+    <div class="right">
+
+        {{ form.comment.errors }}
+        <label for="id_comment" >Comments:</label>
+        {{ form.comment|tabindex:5 }}
+
+        <div style="display: block;">
+            <a href="{% url 'edit-donor' donor.id %}" style="margin: 10px 0px;" class="round-button" tabindex="6">Back to Donor</a>
+            <input style="display: block; margin-top: 10px;" class="round-button" type="submit" value="Save Donation" tabindex="7"/>
+        </div>
+    </div>
+    <div class="left" style="margin-bottom: 10px">
+
+        {{ form.monetary.errors }}
+        {{ form.monetary|tabindex:1 }}
+        <label for="id_monetary" style="display: inline;">Monetary?</label>
+
+        {{ form.description.errors }}
+        <label for="id_description">Description:</label>
+        {{ form.description|tabindex:2 }}
+
+        {{ form.date.errors }}
+        <label for="id_date">Date:</label>
+        {{ form.date|tabindex:3 }}
+
+        {{ form.amount.errors }}
+        <label for="id_amount">Amount (if monetary):</label> 
+        {{ form.amount|tabindex:4 }}
+
+    </div>
+</form>
+
+<script type="text/javascript">
+   $("#id_date").datepicker(); 
+</script>
+
+{% include "footer.html" %}
+

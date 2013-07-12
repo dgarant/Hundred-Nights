@@ -1,0 +1,38 @@
+{% load tag_extras %} 
+{% include "topmatter.html" %}
+
+<fieldset>
+    <legend>Donors</legend>
+
+    <a href="{% url "HundredNights.views.edit_donor" %}" class="round-button" style="margin: 5px 10px;">Add Donor</a>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Is Org.</th>
+                <th>Town</th>
+                <th>Num. Donations</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donor in donors %}
+                <tr>
+                    <td>{{ donor.name }}</td>
+                    <td>{{ donor.is_organization|bool_yn }}</td>
+                    <td>{{ donor.city }}</td>
+                    <td>{{ donor.donation_set.count }}</td>
+                    <td>
+<a href="{% url 'edit-donor' donor.id%}">Edit</a> | 
+<a href="{% url 'delete-donor' donor.id%}">Delete</a>
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</fieldset>
+
+{% include "footer.html" %}
+
