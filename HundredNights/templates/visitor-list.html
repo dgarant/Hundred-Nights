@@ -1,4 +1,5 @@
 
+{% load bool_yn from tag_extras %}
 {% include "topmatter.html" %}
 
 <script type="text/javascript">
@@ -8,7 +9,7 @@
 <fieldset>
     <legend>Visitors</legend>
 
-    <a href="/edit-visitor" class="add-link" >Add Visitor</a>
+    <a href="{% url 'add-visitor' %}" class="round-button" >Add Visitor</a>
 
     <table class="data-table">
         <thead>
@@ -16,8 +17,7 @@
                 <th>Name</th>
                 <th>Town of Residence</th>
                 <th>Town of ID</th>
-                <th>Age</th>
-                <th>Veteran</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -26,14 +26,10 @@
                 <td>{{visitor.name}}</td>
                 <td>{{visitor.town_of_residence}}</td>
                 <td>{{visitor.town_of_id}}</td>
-                <td>{{visitor.age | default_if_none:""}}</td>
-                {% if donor.veteran == True %}
-                    <td>Yes</td>
-                {% elif donor.veteran == False %}
-                    <td>No</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
+                <td>
+                    <a href="{% url 'edit-visitor' visitor.pk %}">Edit</a> | 
+                    <a href="{% url 'delete-visitor' visitor.pk %}">Delete</a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

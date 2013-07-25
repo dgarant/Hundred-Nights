@@ -81,6 +81,16 @@ class VisitType(models.Model):
     def __unicode__(self):
         return unicode(self.type)
 
+class ParticipationType(models.Model):
+    type = models.CharField(max_length=50, unique=True,
+        verbose_name="Participation Type")
+
+    class Meta:
+        verbose_name = "Participation Type"
+
+    def __unicode__(self):
+        return unicode(self.type)
+
 class Visit(models.Model):
     visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
     date = models.DateField(verbose_name="Visit Date", default=datetime.now)
@@ -121,6 +131,9 @@ class VolunteerParticipation(models.Model):
         decimal_places=2, verbose_name="Number of hours")
     num_participants = models.IntegerField(
         verbose_name="Number of participants (if group)", null=True, blank=True)
+    participation_type = models.ForeignKey(ParticipationType, 
+        verbose_name="Participation Type")
+    comment = models.TextField(verbose_name="Comments", null=True, blank=True)
 
     class Meta:
         verbose_name = "Volunteer Participation"

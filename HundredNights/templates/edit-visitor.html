@@ -1,7 +1,89 @@
 
+{% load tabindex from tag_extras %}
+{% load bool_yn from tag_extras %}
 {% include "topmatter.html" %}
 
-A visitor
+<form method="post" action="">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="right">
+
+        {{ form.veteran.errors }}
+        {{ form.veteran|tabindex:5 }}
+        <label for="id_veteran" style="display: inline;">
+        Veteran?</label>
+
+        <div style="display: block">
+            <a href="{% url 'resource-check-in' form.instance.id %}" style="margin-top: 15px;" class="round-button">Check In - Resource Center</a>
+        </div>
+        <div style="display: block">
+            <a href="{% url 'overnight-check-in' form.instance.id %}" class="round-button">Check In - Overnight</a>
+        </div>
+                <a href="{% url 'visitors' %}" style="margin-top: 15px" class="round-button">Back to List</a>
+                <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Visitor" tabindex="10"/>
+    </div>
+    <div class="left">
+        <label for="id_name">Name:</label>
+        {{ form.name.errors }}
+        {{ form.name|tabindex:1 }}
+
+        <label for="id_age">Age:</label>
+        {{ form.age.errors }}
+        {{ form.age|tabindex:2 }}
+
+        <label for="id_town_of_residence">Town of Residence:</label>
+        {{ form.town_of_residence.errors }}
+        {{ form.town_of_residence|tabindex:3 }}
+
+        <label for="id_town_of_id">Town of ID:</label>
+        {{ form.town_of_id.errors }}
+        {{ form.town_of_id|tabindex:4 }}
+
+    </div>
+</form>
+
+{% if form.instance.id %}
+<fieldset style="clear: both;"> 
+    <legend>Visits</legend>
+
+    <a href="{% url 'add-visit' form.instance.id %}" class="round-button">Add Visit</a>
+
+    <table class="visit-table">
+        <thead>
+            <th>Date</th>
+            <th>Visit Type</th>
+            <th></th>
+        </thead>
+        <tbody>
+       {% for visit in visits %}
+            <tr>
+                <td>{{ visit.date }}</td>
+                <td>{{ visit.visit_type }}</td>
+                <td>
+                    <a href="{% url 'edit-visit' form.instance.id visit.id %}">Edit</a> | 
+                    <a href="{% url 'delete-visit' visit.id %}">Delete</a>
+                </td>
+            </tr>
+       {% endfor %}
+   </tbody>
+</table>
+</fieldset>
+
+<script type="text/javascript">
+    var donation_table = $(".visit-table").dataTable({
+        "bLengthChange" : false,
+        "iDisplayLength": 1000,
+        "sDom": 'T<"clear">lfrtip',
+        "bFilter" : false,
+        "bPaginate" : false,
+        "bInfo" : false,
+        "oTableTools": {
+            "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+            "aButtons" : [ ]
+        }
+    });
+</script>
+{% endif %}
 
 {% include "footer.html" %}
 
