@@ -1,0 +1,46 @@
+
+{% load tabindex from tag_extras %}
+{% include "topmatter.html" %}
+
+<style type="text/css">
+    textarea#id_comment {
+        width: 250px;
+        height: 50px;
+    }
+    .right {
+        width: 75%;
+    }
+</style>
+<form method="post" action="">
+    {% csrf_token %}
+    <p style="font-weight: bold;">Visitor: {{ visitor.name }}</p>
+
+    {{ form.non_field_errors }}
+    {{ form.visitor }}
+
+    <label for="id_visit_type" >Visit Type:</label>
+    {{ form.visit_type.errors }}
+    {{ form.visit_type|tabindex:1 }}
+
+    <label for="id_date">Date:</label>
+    {{ form.date.errors }}
+    {{ form.date|tabindex:2 }}
+
+    <label for="id_comment" style="display:block">Comment:</label>
+    {{ form.comment.errors }}
+    {{ form.comment|tabindex:3}}
+
+    <div style="display: block">
+        <a href="{% url 'edit-visitor' visitor.id %}" class="round-button">Back to Visitor</a>
+        <input type="submit" value="Save" class="round-button" />
+    </div>
+
+
+</form>
+
+<script type="text/javascript">
+   $("#id_date").datepicker(); 
+</script>
+
+{% include "footer.html" %}
+

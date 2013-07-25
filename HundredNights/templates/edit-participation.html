@@ -1,0 +1,59 @@
+
+{% load tabindex from tag_extras %}
+{% include "topmatter.html" %}
+
+<style type="text/css">
+    textarea#id_comment {
+        width: 250px;
+        height: 50px;
+    }
+    .right {
+        width: 75%;
+    }
+</style>
+<form method="post" action="">
+    {% csrf_token %}
+    <p style="font-weight: bold;">Volunteer: {{ volunteer.name }}</p>
+
+    {{ form.non_field_errors }}
+    {{ form.volunteer }}
+
+    <div class="right">
+
+
+        {{ form.comment.errors }}
+        <label for="id_comment">Comment:</label>
+        {{ form.comment|tabindex:5 }}
+
+        <div style="display: block;">
+            <a href="{% url 'edit-volunteer' volunteer.id %}" style="margin: 10px 0px;" class="round-button" tabindex="6">Back to Volunteer</a>
+            <input style="display: block; margin-top: 10px;" class="round-button" type="submit" value="Save Participation" tabindex="7"/>
+        </div>
+    </div>
+    <div class="left" style="margin-bottom: 10px">
+
+        {{ form.date.errors }}
+        <label for="id_date">Date:</label>
+        {{ form.date|tabindex:1 }}
+
+        {{ form.hours.errors }}
+        <label for="id_hours">Hours:</label>
+        {{ form.hours|tabindex:2 }}
+
+        {{ form.num_participants.errors }}
+        <label for="id_num_participants">Number of Participants:</label>
+        {{ form.num_participants|tabindex:3 }}
+
+        {{ form.participation_type.errors }}
+        <label for="id_participation_type" >Participation Type:</label>
+        {{ form.participation_type|tabindex:4 }}
+
+    </div>
+</form>
+
+<script type="text/javascript">
+   $("#id_date").datepicker(); 
+</script>
+
+{% include "footer.html" %}
+
