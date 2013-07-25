@@ -1,7 +1,38 @@
 
+{% load tag_extras %} 
 {% include "topmatter.html" %}
 
-Volunteers
+<fieldset>
+    <legend>Volunteers</legend>
+
+    <a href="{% url 'add-volunteer' %}" class="round-button" style="margin: 5px 10px;">Add Volunteer</a>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Group?</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for volunteer in volunteers %}
+                <tr>
+                    <td>{{ volunteer.name }}</td>
+                    <td>{{ volunteer.age }}</td>
+                    <td>{{ volunteer.is_group|bool_yn }}</td>
+                    <td>
+<a href="{% url 'edit-volunteer' volunteer.id%}">Edit</a> | 
+<a href="{% url 'delete-volunteer' volunteer.id%}">Delete</a>
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</fieldset>
+
 
 {% include "footer.html" %}
 

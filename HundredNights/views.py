@@ -13,19 +13,143 @@ from django.forms import widgets
 def index(request):
     return render(request, 'index.html', {})
 
+def edit_visit(request, visitor_id, visit_id=None):
+    visitor = Visitor.objects.get(id=visitor_id)
+    visit = None
+    try:
+        visit = Visit.objects.get(id=visit_id)
+    except Visit.DoesNotExist:
+        form = VisitForm(initial={'visitor' : visitor.pk})
+
+    if request.method == "POST":
+        form = VisitForm(request.POST, request.FILES, instance=visit)
+        if form.is_valid():
+            form.save()
+            return redirect("edit-visitor", visitor_id=visitor_id)
+    elif visit_id:
+        form = VisitForm(instance=visit, 
+                    initial={'visitor' : visitor.pk})
+
+    return render(request, 'edit-visit.html',
+        {"form" : form, "visitor" : visitor})
+
+def delete_visit(request, visit_id):
+    visit = Visit.objects.get(id=visit_id)
+    visitor_id = visit.visitor.id
+    visit.delete()
+    return redirect('edit-visitor', visitor_id=visitor_id)
+
+def visitor_check_in_resource(request, visitor_id):
+    visitor = Visitor.objects.get(id=visitor_id)
+    visit = Visit()
+    visit.visitor = visitor
+    visit.date = datetime.now()
+    visit.visit_type = VisitType.objects.get(type="Resource Center")
+    visit.save()
+    return redirect('edit-visitor', visitor_id=visitor_id)
+
+def visitor_check_in_overnight(request, visitor_id):
+    visitor = Visitor.objects.get(id=visitor_id)
+    visit = Visit()
+    visit.visitor = visitor
+    visit.date = datetime.now()
+    visit.visit_type = VisitType.objects.get(type="Overnight")
+    visit.save()
+    return redirect('edit-visitor', visitor_id=visitor_id)
+
 def visit_log(request):
     return render(request, 'visitor-list.html', 
             {"visitors" : Visitor.objects.all()})
 
+def edit_visitor(request, visitor_id=None):
+    visitor = None
+    try:
+        visitor = Visitor.objects.get(id=visitor_id)
+        visits = visitor.visit_set.all()
+    except Visitor.DoesNotExist:
+        form = VisitorForm()
+        visits = []
+
+    if request.method == "POST":
+        form = VisitorForm(request.POST, request.FILES, instance=visitor)
+        if form.is_valid():
+            form.save()
+            # on adds, re-render the page so donations can be added
+            if visitor != None:
+                return redirect("visitors")
+    elif visitor_id:
+        form = VisitorForm(instance=visitor)
+
+    return render(request, 'edit-visitor.html', 
+        {"form" : form, "visits" : visits})
+
+def delete_visitor(request, visitor_id):
+    visitor = Visitor.objects.get(id=visitor_id)
+    visitor.delete()
+    return redirect("visitors")
+
+def volunteers(request):
+    volunteers = Volunteer.objects.all()
+    return render(request, 'volunteer-list.html', 
+            {"volunteers" : volunteers})
+
+def edit_volunteer(request, volunteer_id=None):
+    volunteer = None
+    try:
+        volunteer = Volunteer.objects.get(id=volunteer_id)
+        participation = volunteer.volunteerparticipation_set.all()
+    except Volunteer.DoesNotExist:
+        print("Volunteer with id {0} does not exist".format(volunteer_id))
+        form = VolunteerForm()
+        participation = []
+
+    if request.method == "POST":
+        form = VolunteerForm(request.POST, request.FILES, instance=volunteer)
+        if form.is_valid():
+            form.save()
+            # on adds, re-render the page so donations can be added
+            if volunteer != None:
+                return redirect("volunteers")
+    elif volunteer_id:
+        form = VolunteerForm(instance=volunteer)
+
+    return render(request, 'edit-volunteer.html', 
+        {"form" : form, "participation" : participation})
+
+def delete_volunteer(request, volunteer_id=None):
+    volunteer = Volunteer.objects.get(id=volunteer_id)
+    volunteer.delete()
+    return redirect("volunteers")
+
+def edit_participation(request, volunteer_id, part_id=None):
+    volunteer = Volunteer.objects.get(id=volunteer_id)
+    participation = None
+    try:
+        participation = VolunteerParticipation.objects.get(id=part_id)
+    except VolunteerParticipation.DoesNotExist:
+        form = ParticipationForm(initial={"volunteer" : volunteer.pk})
+
+    if request.method == "POST":
+        form = ParticipationForm(request.POST, request.FILES, instance=participation)
+        if form.is_valid():
+            form.save()
+            return redirect("edit-volunteer", volunteer_id=volunteer_id)
+    elif part_id:
+        form = ParticipationForm(instance=participation, 
+                    initial={'volunteer' : volunteer.pk})
+
+    return render(request, 'edit-participation.html',
+        {"form" : form, "volunteer" : volunteer})
+
+def delete_participation(request, part_id=None):
+    to_delete = VolunteerParticipation.objects.get(id=part_id)
+    volunteer_id = to_delete.volunteer.id
+    to_delete.delete()
+    return redirect("edit-volunteer", volunteer_id=volunteer_id)
+
 def donors(request):
     donors = Donor.objects.all()
     return render(request, 'donor-list.html', {"donors" : donors})
-
-def volunteers(request):
-    return render(request, 'volunteer-list.html', {})
-
-def edit_visitor(request):
-    return render(request, 'edit-visitor.html', {})
 
 def edit_donor(request, donor_id=None):
     donor = None
@@ -82,9 +206,6 @@ def delete_donation(request, donation_id):
     to_delete.delete()
     return redirect("edit-donor", donor_id=donor_id)
 
-def edit_volunteer(request):
-    return render(request, 'edit-volunteer.html', {})
-    
 @csrf_protect
 def upload_donors(request):
     row_num = 0

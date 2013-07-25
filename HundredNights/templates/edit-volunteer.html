@@ -1,7 +1,104 @@
 
+{% load tabindex from tag_extras %}
+{% load currency from tag_extras %}
+{% load bool_yn from tag_extras %}
 {% include "topmatter.html" %}
 
-A volunteer
+<form method="post" action="">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="right">
+
+        <label for="id_zip">Zip:</label>
+        {{ form.zip.errors }}
+        {{ form.zip|tabindex:5 }}
+
+        <label for="id_state">State:</label>
+        {{ form.state.errors }}
+        {{ form.state|tabindex:6 }}
+
+        <div style="display: block; margin-top: 10px;">
+            {{ form.is_group.errors }}
+            {{ form.is_group|tabindex:7 }}
+            <label for="id_is_organization" style="display: inline;">
+            Is this a group?</label>
+        </div>
+
+        <div style="display: block;">
+            <a href="{% url 'volunteers' %}" style="margin-top: 15px" class="round-button">Back to List</a>
+            <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Volunteer" tabindex="10"/>
+        </div>
+    </div>
+    <div class="left">
+        <label for="id_name">Name:</label>
+        {{ form.name.errors }}
+        {{ form.name|tabindex:1 }}
+
+        <label for="id_title">Title:</label>
+        {{ form.age.errors }}
+        {{ form.age|tabindex:2 }}
+
+        <label for="id_street_1">Street 1:</label>
+        {{ form.street_1.errors }}
+        {{ form.street_1|tabindex:3 }}
+
+        <label for="id_street_2">Street 2:</label>
+        {{ form.street_2.errors }}
+        {{ form.street_2|tabindex:4 }}
+
+        <div style="margin-bottom: 30px;">
+        </div>
+
+    </div>
+
+</form>
+
+{% if form.instance.id %}
+    <fieldset>
+        <a href="{% url 'add-participation' form.instance.id %}" class="round-button">Add Participation</a>
+        <legend>Participation</legend>
+        <table id="part-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>Participation Type</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for part in participation%}
+                   <tr>
+                        <td>{{ part.date }}</td>
+                        <td>{{ part.hours}}</td>
+                        <td>{{ part.participation_type }}</td>
+                        <td>
+                            <a href="{% url 'edit-participation' form.instance.id part.id %}">Edit</a> | 
+                            <a href="{% url 'delete-participation' part.id %}">Delete</a>
+                        </td>
+                   </tr> 
+                {% endfor %}
+            </tbody>
+        </table>
+    </fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var part_table = $("#part-table").dataTable({
+            "bLengthChange" : false,
+            "iDisplayLength": 1000,
+             "sDom": 'T<"clear">lfrtip',
+            "bFilter" : false,
+            "bPaginate" : false,
+            "bInfo" : false,
+            "oTableTools": {
+                "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                "aButtons" : [ ]
+            }
+        });
+    });
+</script>
+{% endif %}
 
 {% include "footer.html" %}
 
