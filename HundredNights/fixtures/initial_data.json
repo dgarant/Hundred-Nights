@@ -1,0 +1,38 @@
+[
+    {
+        "pk": null, 
+        "model": "HundredNights.visittype", 
+        "fields": 
+        {
+            "type": "Resource Center"
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "HundredNights.visittype", 
+        "fields": {"type": "Overnight"}
+    },
+    {
+        "pk": null, 
+        "model": "HundredNights.visittype", 
+        "fields": {"type": "Other"}
+    },
+    {
+        "pk": null, 
+        "model": "HundredNights.participationtype", 
+        "fields": 
+        {
+            "type": "Resource Center"
+        }
+    }, 
+    {
+        "pk": null, 
+        "model": "HundredNights.participationtype", 
+        "fields": {"type": "Overnight"}
+    },
+    {
+        "pk": null, 
+        "model": "HundredNights.participationtype", 
+        "fields": {"type": "Other"}
+    }
+]
