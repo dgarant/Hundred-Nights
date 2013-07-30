@@ -40,6 +40,7 @@ TIME_ZONE = 'America/New_York'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
@@ -121,6 +122,8 @@ ROOT_URLCONF = 'HundredNights.urls'
 WSGI_APPLICATION = 'HundredNights.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(SITE_ROOT, 'templates'),
+    os.path.join(SITE_ROOT, 'report-templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.

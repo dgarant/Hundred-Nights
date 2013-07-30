@@ -4,14 +4,64 @@ from HundredNights.models import *
 from HundredNights.forms import *
 from django.views.decorators.csrf import csrf_protect
 import csv, sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 from django.db.models import Sum, Count
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.forms import widgets
+from django.core import serializers
+from django.utils import simplejson
+from django.db import connection
+from django.http import HttpResponse
+from report_renderer import ReportRenderer
 
 def index(request):
     return render(request, 'index.html', {})
+
+def visit_report(request):
+    renderer = ReportRenderer()
+
+    output_format = request.GET.get('format', 'pdf')
+    start_date = parser.parse(request.GET.get('start-date', 
+        datetime.now() - timedelta(days=30)))
+    end_date = parser.parse(request.GET.get('end-date', datetime.now()))
+    return renderer.create_visit_report_pdf(start_date, end_date)
+
+def donation_report(request):
+    renderer = ReportRenderer()
+    return None
+
+def participation_report(request):
+    renderer = ReportRenderer()
+    return None
+
+def visits_by_month(request):
+    cursor = connection.cursor()
+    cursor.execute("""select 
+                        to_char(date, 'MM-YYYY') as MonthName, 
+                        count(*) as VisitCount
+                      from "HundredNights_visit"
+                      group by MonthName
+                      """)
+    results = cursor.fetchall()
+    return HttpResponse(simplejson.dumps(results), 
+            content_type='application/json')
+
+def volunteer_hours_by_month(request):
+    cursor = connection.cursor()
+    cursor.execute("""select
+                    to_char(date, 'MM-YYYY') as MonthName,
+                    sum(hours * coalesce(num_participants, 1)) as Hours
+                    from "HundredNights_volunteerparticipation"
+                    group by MonthName
+                    """)
+    results = cursor.fetchall()
+    return HttpResponse(simplejson.dumps(results),
+                content_type='application/json')
+
+def donation_report(request, output_type, 
+        start_date=None, end_date=None, donor_id=None):
+    donors = Donor.objects.all()
 
 def edit_visit(request, visitor_id, visit_id=None):
     visitor = Visitor.objects.get(id=visitor_id)

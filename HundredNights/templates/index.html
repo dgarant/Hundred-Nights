@@ -1,5 +1,110 @@
 
 {% include "topmatter.html" %}
+ 
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    google.load("visualization", "1", {packages: ["corechart"]});
+    google.setOnLoadCallback(drawCharts);
+    function drawCharts() {
+        $.getJSON("{% url 'visits-by-month' %}", function(data) {
+            var tableData = google.visualization.arrayToDataTable(data)
+            var chart = new google.visualization.LineChart(
+                    document.getElementById('visits-by-month'));
+            var options = {
+                title: 'Visits by Month',
+                legend : { position : "none" }
+            };
+            chart.draw(tableData, options);
+        });
+
+        $.getJSON("{% url 'volunteer-hours-by-month' %}", function(data) {
+            var tableData = google.visualization.arrayToDataTable(data);
+            var chart = new google.visualization.LineChart(
+                document.getElementById('volunteer-hours-by-month'));
+            var options = {
+                title : 'Volunteer Hours by Month',
+                legend : { position : "none" }
+            };
+            chart.draw(tableData, options);
+        });
+    }
+
+    $(document).ready(function() {
+        $(".dp").datepicker();
+    });
+</script>
+
+<div id="volunteer-hours-by-month" style="float: right; width: 45%">
+</div>
+
+<div id="visits-by-month" style="width: 45%;">
+</div>
+
+<div style="clear: both;">
+</div>
+
+
+<fieldset>
+    <legend>Visit Report</legend>
+    <form action="{% url 'visit-report' %}" target="_blank" method="get">
+
+        <span style="margin: 5px; font-weight: bold;">Format</span>
+        <select name="format">
+            <option value="pdf">PDF</option>
+            <option value="csv">Excel</option>
+        </select>
+        <div style="display: block;">
+        </div>
+
+        <span style="margin: 5px; font-weight: bold;">Start date</span>
+        <input style="margin: 5px;" type="text" name="start-date" class="dp" />
+
+        <span style="margin: 5px; font-weight: bold;">End date</span>
+        <input style="margin: 5px;" type="text" name="end-date" class="dp" />
+
+        <input type="submit" class="round-button" value="Run" />
+    </form>
+</fieldset>
+
+<fieldset>
+    <legend>Donation Report</legend>
+    <form action="{% url 'donation-report' %}" target="_blank" method="get">
+
+        <span style="margin: 5px; font-weight: bold;">Format</span>
+        <select name="format">
+            <option value="pdf">PDF</option>
+            <option value="csv">Excel</option>
+        </select>
+
+        <span style="margin: 5px; font-weight: bold;">Start date</span>
+        <input style="margin: 5px;" type="text" name="start-date" class="dp" />
+
+        <span style="margin: 5px; font-weight: bold;">End date</span>
+        <input style="margin: 5px;" type="text" name="end-date" class="dp" />
+
+        <input type="submit" class="round-button" value="Run" />
+    </form>
+</fieldset>
+
+<fieldset>
+    <legend>Participation Report</legend>
+    <form action="{% url 'participation-report' %}" target="_blank" method="get">
+
+        <span style="margin: 5px; font-weight: bold;">Format</span>
+        <select name="format">
+            <option value="pdf">PDF</option>
+            <option value="csv">Excel</option>
+        </select>
+
+        <span style="margin: 5px; font-weight: bold;">Start date</span>
+        <input style="margin: 5px;" type="text" name="start-date" class="dp" />
+
+        <span style="margin: 5px; font-weight: bold;">End date</span>
+        <input style="margin: 5px;" type="text" name="end-date" class="dp" />
+
+        <input type="submit" class="round-button" value="Run" />
+    </form>
+</fieldset>
 
 <fieldset>
     <legend>Import</legend>
