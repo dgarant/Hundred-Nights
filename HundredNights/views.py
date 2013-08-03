@@ -82,7 +82,7 @@ def volunteer_hours_by_month(request):
                     order by to_char(date, 'YYYY-MM')
                     """)
     results = cursor.fetchall()
-    return HttpResponse(simplejson.dumps(results),
+    return HttpResponse(simplejson.dumps(results, use_decimal=True),
                 content_type='application/json')
 
 @login_required
