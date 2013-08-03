@@ -1,7 +1,6 @@
 import locale # for formatting
 
 import os
-from xhtml2pdf import pisa
 from io import BytesIO
 from io import StringIO
 import csv
@@ -10,7 +9,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template import Context
 from django.template.loader import get_template
-import tempfile
 from HundredNights.models import *
 
 class ReportRenderer(object):
