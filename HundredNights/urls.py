@@ -7,6 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', index, name='index'),
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
     # report creation functions
     url(r'visit-report/$', visit_report, name='visit-report'),
