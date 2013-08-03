@@ -5,5 +5,4 @@ dj-database-url
 django-localflavor-us
 python-dateutil
 django_extensions
-weasyprint
 
