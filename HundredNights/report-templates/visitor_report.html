@@ -1,14 +1,19 @@
 
+{% load tag_extras %}
+
+<!DOCTYPE html>
 <html>
     <head>
-        <style>
+        <title>Hundred Nights Visitor Report</title>
+        <style type="text/css">
             {% include "style.css" %}
         </style>
     </head>
     <body>
-        <h1>Visit Report {{ start_date }} - {{ end_date }}</h1>
+        <div style="width: 800px; margin: 0 auto;">
+        <h1>Visit Report: {{ start_date }} through {{ end_date }}</h1>
 
-        <h2>Overnight<h2>
+        <h2>Overnight</h2>
         <table>
             <tr>
                 <th>Date</th>
@@ -17,9 +22,9 @@
             </tr>
             {% for visit in overnight_visits %}
             <tr>
-                <td>{{ visit.date }}
+                <td>{{ visit.date }}</td>
                 <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.visitor.age }}</td>
+                <td>{{ visit.visitor.age|replace_none:"-"  }}</td>
             </tr>
             {% endfor %}
             <tr>
@@ -41,9 +46,9 @@
             </tr>
             {% for visit in resource_visits %}
             <tr>
-                <td>{{ visit.date }}
+                <td>{{ visit.date }}</td>
                 <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.visitor.age }}</td>
+                <td>{{ visit.visitor.age|replace_none:"-" }}</td>
             </tr>
             {% endfor %}
             <tr>
@@ -61,24 +66,26 @@
             <tr>
                 <th>Date</th>
                 <th>Name</th>
-                <th>Age</th>
                 <th>Comment</th>
+                <th>Age</th>
             </tr>
             {% for visit in other_visits %}
             <tr>
-                <td>{{ visit.date }}
+                <td>{{ visit.date }}</td>
                 <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.visitor.age }}</td>
+                <td>{{ visit.comment }}</td>
+                <td>{{ visit.visitor.age|replace_none:"-" }}</td>
             </tr>
             {% endfor %}
             <tr>
-                <td colspan="2">Total Visits (other):</td>
+                <td colspan="3">Total Visits (other):</td>
                 <td>{{ other_visits|length }}</td>
             </tr>
             <tr>
-                <td colspan="2">Number of Unique Visitors:</td>
+                <td colspan="3">Number of Unique Visitors:</td>
                 <td>{{ unique_other_visitor_count }}</td>
             </tr>
         </table>
+        </div>
     </body>
 </html>
