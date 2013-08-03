@@ -374,5 +374,6 @@ def upload_visitors(request):
         visit.date = parser.parse(row["DateOfVisit"])
         visit.visit_type = VisitType.objects.get(type="Overnight")
         #visit.comment = row[7]
+        visit.save()
     return render(request, 'index.html', {})
 
