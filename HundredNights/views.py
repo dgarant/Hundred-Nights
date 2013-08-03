@@ -14,55 +14,78 @@ from django.utils import simplejson
 from django.db import connection
 from django.http import HttpResponse
 from report_renderer import ReportRenderer
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def index(request):
     return render(request, 'index.html', {})
 
+@login_required
 def visit_report(request):
     renderer = ReportRenderer()
 
-    output_format = request.GET.get('format', 'pdf')
+    output_format = request.GET.get('format', 'html')
     start_date = parser.parse(request.GET.get('start-date', 
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
-    return renderer.create_visit_report_pdf(start_date, end_date)
+    if output_format == 'html':
+        return renderer.create_visit_report_html(start_date, end_date)
+    else:
+        return renderer.create_visit_report_csv(start_date, end_date)
 
+@login_required
 def donation_report(request):
     renderer = ReportRenderer()
-    return None
+    output_format = request.GET.get('format', 'html')
+    start_date = parser.parse(request.GET.get('start-date', 
+        datetime.now() - timedelta(days=30)))
+    end_date = parser.parse(request.GET.get('end-date', datetime.now()))
+    if output_format == 'html':
+        return renderer.create_donation_report_html(start_date, end_date)
+    else:
+        return renderer.create_donation_report_csv(start_date, end_date)
 
+@login_required
 def participation_report(request):
     renderer = ReportRenderer()
-    return None
+    output_format = request.GET.get('format', 'html')
+    start_date = parser.parse(request.GET.get('start-date', 
+        datetime.now() - timedelta(days=30)))
+    end_date = parser.parse(request.GET.get('end-date', datetime.now()))
+    if output_format == 'html':
+        return renderer.create_participation_report_html(start_date, end_date)
+    else:
+        return renderer.create_participation_report_csv(start_date, end_date)
 
+@login_required
 def visits_by_month(request):
     cursor = connection.cursor()
     cursor.execute("""select 
                         to_char(date, 'MM-YYYY') as MonthName, 
                         count(*) as VisitCount
                       from "HundredNights_visit"
-                      group by MonthName
+                      group by to_char(date, 'YYYY-MM'), MonthName
+                      order by to_char(date, 'YYYY-MM')
                       """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results), 
             content_type='application/json')
 
+@login_required
 def volunteer_hours_by_month(request):
     cursor = connection.cursor()
     cursor.execute("""select
                     to_char(date, 'MM-YYYY') as MonthName,
                     sum(hours * coalesce(num_participants, 1)) as Hours
                     from "HundredNights_volunteerparticipation"
-                    group by MonthName
+                    group by to_char(date, 'YYYY-MM'), MonthName
+                    order by to_char(date, 'YYYY-MM')
                     """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results),
                 content_type='application/json')
 
-def donation_report(request, output_type, 
-        start_date=None, end_date=None, donor_id=None):
-    donors = Donor.objects.all()
-
+@login_required
 def edit_visit(request, visitor_id, visit_id=None):
     visitor = Visitor.objects.get(id=visitor_id)
     visit = None
@@ -83,12 +106,14 @@ def edit_visit(request, visitor_id, visit_id=None):
     return render(request, 'edit-visit.html',
         {"form" : form, "visitor" : visitor})
 
+@login_required
 def delete_visit(request, visit_id):
     visit = Visit.objects.get(id=visit_id)
     visitor_id = visit.visitor.id
     visit.delete()
     return redirect('edit-visitor', visitor_id=visitor_id)
 
+@login_required
 def visitor_check_in_resource(request, visitor_id):
     visitor = Visitor.objects.get(id=visitor_id)
     visit = Visit()
@@ -98,6 +123,7 @@ def visitor_check_in_resource(request, visitor_id):
     visit.save()
     return redirect('edit-visitor', visitor_id=visitor_id)
 
+@login_required
 def visitor_check_in_overnight(request, visitor_id):
     visitor = Visitor.objects.get(id=visitor_id)
     visit = Visit()
@@ -107,10 +133,12 @@ def visitor_check_in_overnight(request, visitor_id):
     visit.save()
     return redirect('edit-visitor', visitor_id=visitor_id)
 
+@login_required
 def visit_log(request):
     return render(request, 'visitor-list.html', 
             {"visitors" : Visitor.objects.all()})
 
+@login_required
 def edit_visitor(request, visitor_id=None):
     visitor = None
     try:
@@ -133,16 +161,19 @@ def edit_visitor(request, visitor_id=None):
     return render(request, 'edit-visitor.html', 
         {"form" : form, "visits" : visits})
 
+@login_required
 def delete_visitor(request, visitor_id):
     visitor = Visitor.objects.get(id=visitor_id)
     visitor.delete()
     return redirect("visitors")
 
+@login_required
 def volunteers(request):
     volunteers = Volunteer.objects.all()
     return render(request, 'volunteer-list.html', 
             {"volunteers" : volunteers})
 
+@login_required
 def edit_volunteer(request, volunteer_id=None):
     volunteer = None
     try:
@@ -166,11 +197,13 @@ def edit_volunteer(request, volunteer_id=None):
     return render(request, 'edit-volunteer.html', 
         {"form" : form, "participation" : participation})
 
+@login_required
 def delete_volunteer(request, volunteer_id=None):
     volunteer = Volunteer.objects.get(id=volunteer_id)
     volunteer.delete()
     return redirect("volunteers")
 
+@login_required
 def edit_participation(request, volunteer_id, part_id=None):
     volunteer = Volunteer.objects.get(id=volunteer_id)
     participation = None
@@ -191,16 +224,19 @@ def edit_participation(request, volunteer_id, part_id=None):
     return render(request, 'edit-participation.html',
         {"form" : form, "volunteer" : volunteer})
 
+@login_required
 def delete_participation(request, part_id=None):
     to_delete = VolunteerParticipation.objects.get(id=part_id)
     volunteer_id = to_delete.volunteer.id
     to_delete.delete()
     return redirect("edit-volunteer", volunteer_id=volunteer_id)
 
+@login_required
 def donors(request):
     donors = Donor.objects.all()
     return render(request, 'donor-list.html', {"donors" : donors})
 
+@login_required
 def edit_donor(request, donor_id=None):
     donor = None
     try:
@@ -224,11 +260,13 @@ def edit_donor(request, donor_id=None):
     return render(request, 'edit-donor.html', 
         {"form" : form, "donations" : donations})
 
+@login_required
 def delete_donor(request, donor_id):
     to_delete = Donor.objects.get(id=donor_id)
     to_delete.delete()
     return redirect("donors")
 
+@login_required
 def edit_donation(request, donor_id, donation_id=None):
     donor = Donor.objects.get(id=donor_id)
     donation = None
@@ -250,12 +288,14 @@ def edit_donation(request, donor_id, donation_id=None):
     return render(request, 'edit-donation.html',
         {"form" : form, "donor" : donor})
 
+@login_required
 def delete_donation(request, donation_id):
     to_delete = Donation.objects.get(id=donation_id)
     donor_id = to_delete.donor.id
     to_delete.delete()
     return redirect("edit-donor", donor_id=donor_id)
 
+@login_required
 @csrf_protect
 def upload_donors(request):
     row_num = 0
@@ -313,6 +353,7 @@ def upload_donors(request):
 
     return render(request, 'index.html', {})
 
+@login_required
 @csrf_protect
 def upload_visitors(request):
     for row in csv.DictReader(request.FILES["visitor-csv"]):
