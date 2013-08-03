@@ -19,6 +19,14 @@ def bool_yn(bool_val):
         return "No"
 
 @register.filter
+def replace_none(val, replacement):
+    if val:
+        return val
+    else:
+        return replacement
+        
+
+@register.filter
 def tabindex(value, index):
     """ Add a tabindex attribute to the widget for a bound field. """
     value.field.widget.attrs['tabindex'] = index
