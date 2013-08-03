@@ -7,6 +7,7 @@
     google.setOnLoadCallback(drawCharts);
     function drawCharts() {
         $.getJSON("{% url 'visits-by-month' %}", function(data) {
+            data.unshift(['Month', 'Visit Count'])
             var tableData = google.visualization.arrayToDataTable(data)
             var chart = new google.visualization.LineChart(
                     document.getElementById('visits-by-month'));
@@ -18,6 +19,7 @@
         });
 
         $.getJSON("{% url 'volunteer-hours-by-month' %}", function(data) {
+            data.unshift(['Month', 'Volunteer Hours'])
             var tableData = google.visualization.arrayToDataTable(data);
             var chart = new google.visualization.LineChart(
                 document.getElementById('volunteer-hours-by-month'));
@@ -50,11 +52,10 @@
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
-            <option value="pdf">PDF</option>
+            <option value="html">HTML</option>
             <option value="csv">Excel</option>
         </select>
-        <div style="display: block;">
-        </div>
+        <div style="display: block;"></div>
 
         <span style="margin: 5px; font-weight: bold;">Start date</span>
         <input style="margin: 5px;" type="text" name="start-date" class="dp" />
@@ -72,9 +73,10 @@
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
-            <option value="pdf">PDF</option>
+            <option value="html">HTML</option>
             <option value="csv">Excel</option>
         </select>
+        <div style="display: block;"></div>
 
         <span style="margin: 5px; font-weight: bold;">Start date</span>
         <input style="margin: 5px;" type="text" name="start-date" class="dp" />
@@ -92,9 +94,10 @@
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
-            <option value="pdf">PDF</option>
+            <option value="html">HTML</option>
             <option value="csv">Excel</option>
         </select>
+        <div style="display: block;"></div>
 
         <span style="margin: 5px; font-weight: bold;">Start date</span>
         <input style="margin: 5px;" type="text" name="start-date" class="dp" />
@@ -113,14 +116,14 @@
     <form method="POST" action="/upload-visitors" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="visitor-csv"></input>
-        <input type="submit"></input>
+        <input type="submit" class="round-button"></input>
     </form>
 
     <h3 style="margin-top: 20px;">Donors</h3>
     <form method="POST" action="/upload-donors" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="donor-csv"></input>
-        <input type="submit"></input>
+        <input type="submit" class="round-button"></input>
     </form>
 </fieldset>
 
