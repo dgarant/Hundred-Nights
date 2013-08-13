@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.template import Context
 from django.template.loader import get_template
 from HundredNights.models import *
+from itertools import chain
 
 class ReportRenderer(object):
 
@@ -101,7 +102,9 @@ class ReportRenderer(object):
 
     def create_participation_report_csv(self, start_date, end_date):
         data_dict = self.__create_participation_report_data(start_date, end_date)
-        part = data_dict['overnight_part'] | data_dict['resource_part'] | data_dict['other_part']
+        part = VolunteerParticipation.objects.none()
+        for q in [p[1] for p in data_dict["part_info"]]:
+            part = part | q
         filename = 'HundredNightsParticipation-{0}-thru-{1}.csv'.format(data_dict['start_date'], data_dict['end_date'])
         data = [[p.volunteer.name, p.volunteer.age, p.volunteer.street_1, p.volunteer.street_2,
                  p.volunteer.zip, p.volunteer.state, p.volunteer.is_group, 
@@ -116,33 +119,25 @@ class ReportRenderer(object):
         return self.__render_to_html('participation_report.html', data)
 
     def __create_participation_report_data(self, start_date, end_date):
-        overnight_type = VisitType.objects.get(type='Overnight')
-        resource_type = VisitType.objects.get(type='Resource Center')
-        other_type = VisitType.objects.get(type='Other')
-
-        overnight_part = VolunteerParticipation.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             participation_type__exact=overnight_type)
-        resource_part = VolunteerParticipation.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             participation_type__exact=resource_type)
-        other_part = VolunteerParticipation.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             participation_type__exact=other_type)
-        overnight_hours = sum([p.hours * (p.num_participants if p.num_participants else 1) 
-                                for p in overnight_part])
-        resource_hours = sum([p.hours * (p.num_participants if p.num_participants else 1) 
-                                for p in resource_part])
-        other_hours = sum([p.hours * (p.num_participants if p.num_participants else 1) 
-                                for p in other_part])
+        part_by_type = [( 
+                          v.type, 
+                          v.volunteerparticipation_set
+                                .filter(date__gte=start_date, date__lte=end_date)
+                        )
+                    for v in ParticipationType.objects.all()]
+                        
+        # append hours for each type
+        part_info = []
+        for part_tuple in part_by_type:
+            part_info.append((
+                            part_tuple[0], # part type
+                            part_tuple[1], # participation records
+                            sum([p.hours * (p.num_participants if p.num_participants else 1) 
+                                for p in part_tuple[1]]) # hours for this type
+                            ))
         return {
-                "overnight_part" : overnight_part, 
-                "resource_part" : resource_part, 
-                "other_part" : other_part,
-                "total_overnight_hours" : overnight_hours,
-                "total_resource_hours" : resource_hours,
-                "total_other_hours" : other_hours,
-                "total_volunteer_hours" : overnight_hours + resource_hours + other_hours,
+                "part_info" : part_info, 
+                "total_volunteer_hours" : sum([p[2] for p in part_info]),
                 "start_date" : datetime.strftime(start_date, '%Y-%m-%d'),
                 "end_date" : datetime.strftime(end_date, '%Y-%m-%d')
                }

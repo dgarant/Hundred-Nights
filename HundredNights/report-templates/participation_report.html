@@ -13,7 +13,8 @@
         <div style="width: 800px; margin: 0 auto;">
         <h1>Participation Report: {{ start_date }} through {{ end_date }}</h1>
 
-        <h2>Overnight</h2>
+        {% for type, records, hours in part_info %}
+        <h2>{{type}}</h2>
         <table>
             <tr>
                 <th>Date</th>
@@ -23,7 +24,7 @@
                 <th>Num. Participants</th>
                 <th>Comment</th>
             </tr>
-            {% for part in overnight_part %}
+            {% for part in records %}
             <tr>
                 <td>{{ part.date }}</td>
                 <td>{{ part.volunteer.name }}</td>
@@ -34,62 +35,11 @@
             </tr>
             {% endfor %}
             <tr>
-                <td colspan="5" style="text-align: right" >Overnight Volunteer Hours:</td>
-                <td>{{ total_overnight_hours }}</td>
+                <td colspan="5" style="text-align: right" >{{type}} Hours:</td>
+                <td>{{ hours }}</td>
             </tr>
         </table>
-
-        <h2>Resource Center</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Group?</th>
-                <th>Hours</th>
-                <th>Num. Participants</th>
-                <th>Comment</th>
-            </tr>
-            {% for part in resource_part %}
-            <tr>
-                <td>{{ part.date }}</td>
-                <td>{{ part.volunteer.name }}</td>
-                <td>{{ part.volunteer.is_group|bool_yn }}</td>
-                <td>{{ part.hours }}</td>
-                <td>{{ part.num_participants }}</td>
-                <td>{{ part.comment }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="5" style="text-align: right">Resource Center Volunteer Hours:</td>
-                <td>{{ total_resource_hours }}</td>
-            </tr>
-        </table>
-
-        <h2>Other</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Group?</th>
-                <th>Hours</th>
-                <th>Num. Participants</th>
-                <th>Comment</th>
-            </tr>
-            {% for part in other_part %}
-            <tr>
-                <td>{{ part.date }}</td>
-                <td>{{ part.volunteer.name }}</td>
-                <td>{{ part.volunteer.is_group|bool_yn }}</td>
-                <td>{{ part.hours }}</td>
-                <td>{{ part.num_participants }}</td>
-                <td>{{ part.comment }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="5" style="text-align: right">Other Volunteer Hours:</td>
-                <td>{{ total_other_hours }}</td>
-            </tr>
-        </table>
+        {% endfor %}
 
         <div style="margin-top: 20px;">
             <span style="font-weight: bold;">Total Volunteer Hours: {{ total_volunteer_hours }}</span>
