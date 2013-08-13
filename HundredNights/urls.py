@@ -59,6 +59,7 @@ urlpatterns = patterns('',
     # CSV file uploads
     url(r'^upload-donors.*$', upload_donors, name='upload-donors'),
     url(r'^upload-visitors.*$', upload_visitors, name='upload-visitors'),
+    url(r'^upload-volunteers.*$', upload_volunteers, name='upload-volunteers'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

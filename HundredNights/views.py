@@ -377,3 +377,25 @@ def upload_visitors(request):
         visit.save()
     return render(request, 'index.html', {})
 
+@login_required
+@csrf_protect
+def upload_volunteers(request):
+    for row in csv.DictReader(request.FILES["volunteer-csv"]):
+        try:
+            volunteer = Volunteer.objects.get(name=row["Person"])
+        except Volunteer.DoesNotExist:
+            volunteer = Volunteer()
+            volunteer.name = row["Person"]
+            volunteer.save()
+
+        part = VolunteerParticipation()
+        part.volunteer = volunteer
+        part.date = parser.parse(row["Date"])
+        part.hours = row["Hours"]
+        part.participation_type = ParticipationType.objects.get(
+                                        type=row["VolType"])
+        part.comment = row["Comment"]
+        part.save()
+
+    return render(request, 'index.html', {})
+
