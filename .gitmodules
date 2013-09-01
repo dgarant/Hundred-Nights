@@ -1,0 +1,3 @@
+[submodule "Name-Gender-Guesser"]
+	path = Name-Gender-Guesser
+	url = https://github.com/amacinho/Name-Gender-Guesser.git
