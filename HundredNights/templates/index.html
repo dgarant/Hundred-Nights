@@ -115,6 +115,12 @@
     <h3>Visitors</h3>
     <form method="POST" action="/upload-visitors" enctype="multipart/form-data">
         {% csrf_token %}
+        <div style="display: block;">
+            <select name="visit-type" id="visit-type">
+                <option value="Resource Center">Resource Center</option>
+                <option value="Overnight">Overnight</option>
+            </select>
+        </div>
         <input type="file" name="visitor-csv"></input>
         <input type="submit" class="round-button"></input>
     </form>

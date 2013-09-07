@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from HundredNights.models import *
 from HundredNights.forms import *
 from django.views.decorators.csrf import csrf_protect
-import csv, sys
 from datetime import datetime, timedelta
 from dateutil import parser
 from django.db.models import Sum, Count
@@ -15,6 +14,7 @@ from django.db import connection
 from django.http import HttpResponse
 from report_renderer import ReportRenderer
 from django.contrib.auth.decorators import login_required
+import csv, sys, os
 
 @login_required
 def index(request):
@@ -356,14 +356,52 @@ def upload_donors(request):
 @login_required
 @csrf_protect
 def upload_visitors(request):
+    gender_path = os.path.join(
+        os.path.dirname(__file__), '..', 'Name-Gender-Guesser')
+    sys.path.append(gender_path)
+    from name_gender import NameGender
+
+    primary_guesser = NameGender(
+                    os.path.join(gender_path, "us_census_1990_males"), 
+                    os.path.join(gender_path, "us_census_1990_females"))
+    secondary_guesser = NameGender(
+                    os.path.join(gender_path, "popular_1960_2010_males"),
+                    os.path.join(gender_path, "popular_1960_2010_females"))
+
+    def guess_gender(guesser, first_name):
+        m,f = guesser.get_gender_scores(first_name)
+        print("Name: {0}, male: {1}, female: {2}".format(first_name, m, f))
+        if m > 0.8:
+            return "M"
+        elif f > 0.8:
+            return "F"
+        else:
+            return None
+
     for row in csv.DictReader(request.FILES["visitor-csv"]):
 
         try:
-            visitor = Visitor.objects.get(name=row["Name"])
+            # try to find the user on their last name
+            # if there are multiple users with the same, use the full name
+            first_name = None
+            try:
+                last_name, first_name = row["Name"].split(",")
+                first_name = first_name.strip(" ")
+                visitor = Visitor.objects.get(name__icontains=last_name)
+                if len(row["Name"]) > len(visitor.name):
+                    visitor.name = row["Name"]
+                    visitor.save()
+            except:
+                visitor = Visitor.objects.get(name=row["Name"])
         except Visitor.DoesNotExist:
             visitor = Visitor()
             visitor.name = row["Name"]
             #visitor.age = int(row[1])
+            if first_name:
+                visitor.gender = guess_gender(primary_guesser, first_name)
+                if not visitor.gender:
+                    visitor.gender = guess_gender(secondary_guesser, first_name)
+
             visitor.town_of_residence = row["Town"]
             visitor.town_of_id = row["TownOfId"]
             visitor.veteran = False#row[4].lower() == "true"
@@ -372,7 +410,8 @@ def upload_visitors(request):
         visit = Visit()
         visit.visitor = visitor
         visit.date = parser.parse(row["DateOfVisit"])
-        visit.visit_type = VisitType.objects.get(type="Overnight")
+        visit.visit_type = VisitType.objects.get(
+                    type=request.POST.get("visit-type"))
         #visit.comment = row[7]
         visit.save()
     return render(request, 'index.html', {})
