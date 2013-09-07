@@ -370,7 +370,7 @@ def upload_visitors(request):
 
     def guess_gender(guesser, first_name):
         m,f = guesser.get_gender_scores(first_name)
-        print("Name: {0}, male: {1}, female: {2}".format(first_name, m, f))
+        #print("Name: {0}, male: {1}, female: {2}".format(first_name, m, f))
         if m > 0.8:
             return "M"
         elif f > 0.8:
