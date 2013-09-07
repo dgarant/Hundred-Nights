@@ -31,9 +31,9 @@
         {{ form.name.errors }}
         {{ form.name|tabindex:1 }}
 
-        <label for="id_age">Age:</label>
-        {{ form.age.errors }}
-        {{ form.age|tabindex:2 }}
+        <label for="id_date_of_birth">Date of Birth:</label>
+        {{ form.date_of_birth.errors }}
+        {{ form.date_of_birth|tabindex:2 }}
 
         <label for="id_town_of_residence">Town of Residence:</label>
         {{ form.town_of_residence.errors }}
@@ -43,8 +43,21 @@
         {{ form.town_of_id.errors }}
         {{ form.town_of_id|tabindex:4 }}
 
+        <label for="id_gender">Gender:</label>
+        {{ form.gender.errors }}
+        {{ form.gender|tabindex:5 }}
+
     </div>
 </form>
+
+<script type="text/javascript">
+   $("#id_date_of_birth").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '1940:c',
+        defaultDate: '-30y'
+   }); 
+</script>
 
 {% if form.instance.id %}
 <fieldset style="clear: both;"> 
@@ -65,7 +78,8 @@
                 <td>{{ visit.visit_type }}</td>
                 <td>
                     <a href="{% url 'edit-visit' form.instance.id visit.id %}">Edit</a> | 
-                    <a href="{% url 'delete-visit' visit.id %}">Delete</a>
+                    <a href="{% url 'delete-visit' visit.id %}"
+                        onclick="return confirm('Are you sure you want to delete the visit?')">Delete</a>
                 </td>
             </tr>
        {% endfor %}
@@ -74,7 +88,7 @@
 </fieldset>
 
 <script type="text/javascript">
-    var donation_table = $(".visit-table").dataTable({
+    var visit_table = $(".visit-table").dataTable({
         "bLengthChange" : false,
         "iDisplayLength": 1000,
         "sDom": 'T<"clear">lfrtip',

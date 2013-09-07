@@ -25,7 +25,7 @@
                     <td>{{ donor.donation_set.count }}</td>
                     <td>
 <a href="{% url 'edit-donor' donor.id%}">Edit</a> | 
-<a href="{% url 'delete-donor' donor.id%}">Delete</a>
+<a href="{% url 'delete-donor' donor.id%}" onclick="return confirm('Are you sure you want to delete the donor?')">Delete</a>
                     </td>
 
                 </tr>

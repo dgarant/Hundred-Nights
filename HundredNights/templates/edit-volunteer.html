@@ -9,20 +9,25 @@
     {% csrf_token %}
     <div class="right">
 
-        <label for="id_zip">Zip:</label>
-        {{ form.zip.errors }}
-        {{ form.zip|tabindex:5 }}
-
-        <label for="id_state">State:</label>
-        {{ form.state.errors }}
-        {{ form.state|tabindex:6 }}
 
         <div style="display: block; margin-top: 10px;">
             {{ form.is_group.errors }}
-            {{ form.is_group|tabindex:7 }}
+            {{ form.is_group|tabindex:8 }}
             <label for="id_is_organization" style="display: inline;">
             Is this a group?</label>
         </div>
+
+        <label for="id_contact_name">Contact Name (for groups):</label>
+        {{ form.contact_name.errors }}
+        {{ form.contact_name|tabindex:9 }}
+
+        <label for="id_phone">Contact Phone</label>
+        {{ form.phone.errors }}
+        {{ form.phone|tabindex:10 }}
+
+        <label for="id_email">Contact Email</label>
+        {{ form.email.errors }}
+        {{ form.email|tabindex:11 }}
 
         <div style="display: block;">
             <a href="{% url 'volunteers' %}" style="margin-top: 15px" class="round-button">Back to List</a>
@@ -34,10 +39,6 @@
         {{ form.name.errors }}
         {{ form.name|tabindex:1 }}
 
-        <label for="id_title">Title:</label>
-        {{ form.age.errors }}
-        {{ form.age|tabindex:2 }}
-
         <label for="id_street_1">Street 1:</label>
         {{ form.street_1.errors }}
         {{ form.street_1|tabindex:3 }}
@@ -46,12 +47,37 @@
         {{ form.street_2.errors }}
         {{ form.street_2|tabindex:4 }}
 
+        <label for="id_town">Town:</label>
+        {{ form.town.errors }}
+        {{ form.town|tabindex:5}}
+
+        <label for="id_date_of_birth">Date of Birth:</label>
+        {{ form.date_of_birth.errors }}
+        {{ form.date_of_birth|tabindex:6 }}
+
+        <label for="id_zip">Zip:</label>
+        {{ form.zip.errors }}
+        {{ form.zip|tabindex:6 }}
+
+        <label for="id_state">State:</label>
+        {{ form.state.errors }}
+        {{ form.state|tabindex:7 }}
+
         <div style="margin-bottom: 30px;">
         </div>
 
     </div>
 
 </form>
+
+<script type="text/javascript">
+   $("#id_date_of_birth").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '1940:c',
+        defaultDate: '-30y'
+   }); 
+</script>
 
 {% if form.instance.id %}
     <fieldset>
@@ -74,7 +100,8 @@
                         <td>{{ part.participation_type }}</td>
                         <td>
                             <a href="{% url 'edit-participation' form.instance.id part.id %}">Edit</a> | 
-                            <a href="{% url 'delete-participation' part.id %}">Delete</a>
+                            <a href="{% url 'delete-participation' part.id %}" 
+                                onclick="return confirm('Are you sure you want to delete the participation?')">Delete</a>
                         </td>
                    </tr> 
                 {% endfor %}

@@ -57,7 +57,9 @@ class Donation(models.Model):
 class Visitor(models.Model):
     name = models.CharField(max_length=75,
         verbose_name="Visitor Name")
-    age = models.IntegerField(verbose_name="Age", null=True, blank=True)
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
+    gender = models.CharField(max_length=1, choices = (('M', 'Male'), ('F', 'Female')), 
+                            null=True, blank=True)
     town_of_residence = models.CharField(max_length=50,
         verbose_name="Town of Residence", null=True, blank=True)
     town_of_id = models.CharField(max_length=50,
@@ -107,16 +109,25 @@ class Volunteer(models.Model):
     name = models.CharField(max_length=75, 
         verbose_name="Volunteer Name",
         help_text="Enter the full name of the volunteer or volunteer group")
-    age = models.IntegerField(verbose_name="Age", null=True, blank=True)
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     street_1 = models.CharField(max_length=50,
         verbose_name="Street Address 1", null=True, blank=True)
     street_2 = models.CharField(max_length=50,
         verbose_name="Street Address 2", null=True, blank=True)
+    town = models.CharField(max_length=50,
+        verbose_name="Town", null=True, blank=True)
     zip = models.CharField(max_length=9,
         verbose_name="Zip", null=True, blank=True)
     state = models.CharField(max_length=2, choices=STATE_CHOICES, 
         null=True, blank=True, verbose_name="State", default="NH")
     is_group = models.BooleanField(verbose_name="Is this a group?")
+    contact_name = models.CharField(max_length=50, null=True, blank=True, 
+                verbose_name="Contact Name (for group)")
+    phone = models.CharField(max_length=20, null=True, blank=True,
+                verbose_name="Phone")
+    email = models.CharField(max_length=50, null=True, blank=True,
+                verbose_name="Email")
+
 
     class Meta:
         verbose_name = "Volunteer"

@@ -80,7 +80,8 @@
                 <td>{{ donation.comment }}</td>
                 <td>
                     <a href="{% url 'edit-donation' form.instance.id donation.id %}">Edit</a> | 
-                    <a href="{% url 'delete-donation' donation.id %}">Delete</a>
+                    <a href="{% url 'delete-donation' donation.id %}"
+                        onclick="return confirm('Are you sure you want to delete the donation?')">Delete</a>
                 </td>
             </tr>
        {% endfor %}

@@ -142,7 +142,8 @@ INSTALLED_APPS = (
     #'django_tables2',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'HundredNights'
+    'HundredNights',
+    'south'
 )
 
 # A sample logging configuration. The only tangible logging
