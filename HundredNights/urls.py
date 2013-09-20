@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from HundredNights.views import *
+from django.core.urlresolvers import reverse
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -7,7 +8,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', index, name='index'),
-    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {"next_page" : "/"}, name="logout"),
 
     # report creation functions
     url(r'visit-report/$', visit_report, name='visit-report'),
