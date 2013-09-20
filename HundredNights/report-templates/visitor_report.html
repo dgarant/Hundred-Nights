@@ -13,79 +13,25 @@
         <div style="width: 800px; margin: 0 auto;">
         <h1>Visit Report: {{ start_date }} through {{ end_date }}</h1>
 
-        <h2>Overnight</h2>
         <table>
             <tr>
-                <th>Date</th>
                 <th>Name</th>
                 <th>Age</th>
+                <th>Overnight</th>
+                <th>Resource Center</th>
+                <th>Other</th>
             </tr>
-            {% for visit in overnight_visits %}
+            {% for visitor, counts in visit_dict.items %}
             <tr>
-                <td>{{ visit.date }}</td>
-                <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.visitor.age|replace_none:"-"  }}</td>
+                <td>{{ visitor.name }}</td>
+                <td>{{ visitor.age|replace_none:"-"  }}</td>
+                <td>{{ counts.0  }}</td>
+                <td>{{ counts.1  }}</td>
+                <td>{{ counts.2  }}</td>
             </tr>
             {% endfor %}
-            <tr>
-                <td colspan="2">Total Overnight Visits:</td>
-                <td>{{ overnight_visits|length }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">Number of Unique Visitors:</td>
-                <td>{{ unique_overnight_visitor_count }}</td>
-            </tr>
         </table>
 
-        <h2>Resource Center</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Age</th>
-            </tr>
-            {% for visit in resource_visits %}
-            <tr>
-                <td>{{ visit.date }}</td>
-                <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.visitor.age|replace_none:"-" }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="2">Total Resource Center Visits:</td>
-                <td>{{ resource_visits|length }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">Number of Unique Visitors:</td>
-                <td>{{ unique_resource_visitor_count }}</td>
-            </tr>
-        </table>
-
-        <h2>Other</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Comment</th>
-                <th>Age</th>
-            </tr>
-            {% for visit in other_visits %}
-            <tr>
-                <td>{{ visit.date }}</td>
-                <td>{{ visit.visitor.name }}</td>
-                <td>{{ visit.comment }}</td>
-                <td>{{ visit.visitor.age|replace_none:"-" }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="3">Total Visits (other):</td>
-                <td>{{ other_visits|length }}</td>
-            </tr>
-            <tr>
-                <td colspan="3">Number of Unique Visitors:</td>
-                <td>{{ unique_other_visitor_count }}</td>
-            </tr>
-        </table>
         </div>
     </body>
 </html>

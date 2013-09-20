@@ -11,6 +11,7 @@ from django.template import Context
 from django.template.loader import get_template
 from HundredNights.models import *
 from itertools import chain
+from collections import defaultdict
 
 class ReportRenderer(object):
 
@@ -46,7 +47,19 @@ class ReportRenderer(object):
 
     def create_visit_report_html(self, start_date, end_date):
         data = self.__create_visit_report_data(start_date, end_date)
-        return self.__render_to_html('visitor_report.html', data)
+
+        # more terse format for HTML - create a table of counts on a per-visitor basis
+        visitors = defaultdict(lambda: [0, 0, 0]) # to map visitor to list of counts [overnight, resource, other]
+        for visit in data["overnight_visits"]:
+            visitors[visit.visitor][0] += 1
+        for visit in data["resource_visits"]:
+            visitors[visit.visitor][1] += 1
+        for visit in data["other_visits"]:
+            visitors[visit.visitor][2] += 1
+
+        print(visitors.items())
+        return self.__render_to_html('visitor_report.html', {"visit_dict" : dict(visitors), 
+                    "start_date" : data["start_date"], "end_date" : data["end_date"]})
 
     def __create_visit_report_data(self, start_date, end_date):
         overnight_type = VisitType.objects.get(type='Overnight')
