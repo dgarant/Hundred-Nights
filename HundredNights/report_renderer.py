@@ -38,10 +38,10 @@ class ReportRenderer(object):
         data_dict = self.__create_visit_report_data(start_date, end_date)
         visits = data_dict['overnight_visits'] | data_dict['resource_visits'] | data_dict['other_visits']
         filename = 'HundredNightsVisits-{0}-thru-{1}.csv'.format(data_dict['start_date'], data_dict['end_date'])
-        data = [[v.visitor.name, v.visitor.age, v.visitor.town_of_residence, 
+        data = [[v.visitor.name, v.visitor.date_of_birth, v.visitor.town_of_residence, 
                  v.visitor.town_of_id, v.visitor.veteran, v.visit_type, v.date, v.comment]
                 for v in visits]
-        return self.__render_to_csv(['Name', 'Age', 'Town of Residence', 
+        return self.__render_to_csv(['Name', 'Birth Date', 'Town of Residence', 
                                      'Town of ID', 'Veteran?', 'Visit Type', 
                                      'Date', 'Comment'], data, filename)
 
