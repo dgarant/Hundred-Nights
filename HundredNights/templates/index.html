@@ -6,7 +6,7 @@
     google.load("visualization", "1", {packages: ["corechart"]});
     google.setOnLoadCallback(drawCharts);
     function drawCharts() {
-        $.getJSON("{% url 'visits-by-month' %}", function(data) {
+        $.getJSON("{% url visits-by-month %}", function(data) {
             data.unshift(['Month', 'Visit Count'])
             var tableData = google.visualization.arrayToDataTable(data)
             var chart = new google.visualization.LineChart(
@@ -18,7 +18,7 @@
             chart.draw(tableData, options);
         });
 
-        $.getJSON("{% url 'volunteer-hours-by-month' %}", function(data) {
+        $.getJSON("{% url volunteer-hours-by-month %}", function(data) {
             data.unshift(['Month', 'Volunteer Hours'])
             var tableData = google.visualization.arrayToDataTable(data);
             var chart = new google.visualization.LineChart(
@@ -48,7 +48,7 @@
 
 <fieldset>
     <legend>Visit Report</legend>
-    <form action="{% url 'visit-report' %}" target="_blank" method="get">
+    <form action="{% url visit-report %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
@@ -69,7 +69,7 @@
 
 <fieldset>
     <legend>Donation Report</legend>
-    <form action="{% url 'donation-report' %}" target="_blank" method="get">
+    <form action="{% url donation-report %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
@@ -90,7 +90,7 @@
 
 <fieldset>
     <legend>Participation Report</legend>
-    <form action="{% url 'participation-report' %}" target="_blank" method="get">
+    <form action="{% url participation-report %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">

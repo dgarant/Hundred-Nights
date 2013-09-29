@@ -4,7 +4,7 @@
 <fieldset>
     <legend>Donors</legend>
 
-    <a href="{% url "HundredNights.views.edit_donor" %}" class="round-button" style="margin: 5px 10px;">Add Donor</a>
+    <a href="{% url HundredNights.views.edit_donor %}" class="round-button" style="margin: 5px 10px;">Add Donor</a>
 
     <table class="data-table">
         <thead>
@@ -24,8 +24,8 @@
                     <td>{{ donor.city }}</td>
                     <td>{{ donor.donation_set.count }}</td>
                     <td>
-<a href="{% url 'edit-donor' donor.id%}">Edit</a> | 
-<a href="{% url 'delete-donor' donor.id%}" onclick="return confirm('Are you sure you want to delete the donor?')">Delete</a>
+<a href="{% url edit-donor donor.id%}">Edit</a> | 
+<a href="{% url delete-donor donor.id%}" onclick="return confirm('Are you sure you want to delete the donor?')">Delete</a>
                     </td>
 
                 </tr>

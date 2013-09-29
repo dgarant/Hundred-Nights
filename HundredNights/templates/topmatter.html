@@ -56,17 +56,17 @@
                 <div id="left-sidebar">
                     <ul>
                         <li>
-                            <a href="{% url 'visitors' %}">Visitors</a>
+                            <a href="{% url visitors %}">Visitors</a>
                         </li>
                         <li>
-                            <a href="{% url 'volunteers' %}">Volunteers</a>
+                            <a href="{% url volunteers %}">Volunteers</a>
                         </li>
                         <li>
-                            <a href="{% url 'donors' %}">Donors</a>
+                            <a href="{% url donors %}">Donors</a>
                         </li>
                         {% if user.is_authenticated %}
                         <li>
-                            <a href="{% url 'logout' %}">Log Out</a>
+                            <a href="{% url logout %}">Log Out</a>
                         </li>
                         {% endif %}
                     </ul>
