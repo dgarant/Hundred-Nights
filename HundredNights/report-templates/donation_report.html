@@ -1,15 +1,8 @@
 
 {% load tag_extras %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Hundred Nights Donation Report</title>
-        <style type="text/css">
-            {% include "style.css" %}
-        </style>
-    </head>
-    <body>
+{% include "report_header.html" %}
+
         <div style="width: 800px; margin: 0 auto;">
         <h1>Donation Report: {{ start_date }} through {{ end_date }}</h1>
         <table>
