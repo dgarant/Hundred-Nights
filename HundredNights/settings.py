@@ -1,5 +1,6 @@
 # Django settings for HundredNights project.
 import os
+import simplejson as json
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -10,6 +11,13 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+af_services = os.getenv("VCAP_SERVICES")
+if af_services:
+    af_services = json.loads(af_services)
+    host = af_services["postgresql-9.1"][0]["credentials"]["host"]
+else:
+    host = "localhost"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -17,7 +25,7 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': os.environ["HNIGHTS_DB_USER"],
         'PASSWORD': os.environ["HNIGHTS_DB_PASS"],
-        'HOST': os.environ["HNIGHTS_DATABASE_URL"],                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': host,                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
 }
