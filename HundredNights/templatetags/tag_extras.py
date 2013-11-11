@@ -1,5 +1,6 @@
 
 from django import template
+import calendar
 import locale
 
 register = template.Library()
@@ -31,3 +32,9 @@ def tabindex(value, index):
     """ Add a tabindex attribute to the widget for a bound field. """
     value.field.widget.attrs['tabindex'] = index
     return value
+
+@register.filter
+def toticks(d):
+    """ Convert a date to Unix time """
+    return calendar.timegm(d.timetuple())
+    

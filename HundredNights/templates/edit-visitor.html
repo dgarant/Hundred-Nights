@@ -1,5 +1,6 @@
 
 {% load tabindex from tag_extras %}
+{% load toticks from tag_extras %}
 {% load bool_yn from tag_extras %}
 {% include "topmatter.html" %}
 
@@ -67,6 +68,7 @@
 
     <table class="visit-table">
         <thead>
+            <th>Ticks</th>
             <th>Date</th>
             <th>Visit Type</th>
             <th></th>
@@ -74,6 +76,7 @@
         <tbody>
        {% for visit in visits %}
             <tr>
+                <td>{{ visit.date|toticks }}</td>
                 <td>{{ visit.date }}</td>
                 <td>{{ visit.visit_type }}</td>
                 <td>
@@ -88,17 +91,27 @@
 </fieldset>
 
 <script type="text/javascript">
-    var visit_table = $(".visit-table").dataTable({
-        "bLengthChange" : false,
-        "iDisplayLength": 1000,
-        "sDom": 'T<"clear">lfrtip',
-        "bFilter" : false,
-        "bPaginate" : false,
-        "bInfo" : false,
-        "oTableTools": {
-            "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
-            "aButtons" : [ ]
-        }
+    $(document).ready(function() {
+        var visit_table = $(".visit-table").dataTable({
+            "bLengthChange" : false,
+            "iDisplayLength": 1000,
+            "sDom": 'T<"clear">lfrtip',
+            "bFilter" : false,
+            "bPaginate" : false,
+            "bInfo" : false,
+            "oTableTools": {
+                "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                "aButtons" : [ ]
+            },
+            "aoColumns": [ 
+                /* Ticks */   { "bSearchable": false,
+                                 "bVisible":    false },
+                /* Display date */  {"iDataSort" : 0},
+                /* Visit type */ null,
+                /* Links */  null
+            ]
+        });
+        visit_table.fnSort([1, "asc"]);
     });
 </script>
 {% endif %}
