@@ -1,0 +1,34 @@
+
+{% load tag_extras %}
+
+{% include "report_header.html" %}
+
+        <div style="width: 800px; margin: 0 auto;">
+        <h1>Mailing Label Report Generated {{ created_date }}</h1>
+        <table>
+            <tr>
+                <td colspan=4>Total number of donations: {{ donors.count }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Address</td>
+                <th>Email</th>
+            </tr>
+            {% for donor in donors %}
+            <tr>
+                <td>{{ donor.name }}</td>
+                <td>{{ donor.title|replace_none:"-" }}</td>
+                {% if donor.street_2 %}
+                <td>{{ donor.street_1 }} {{ donor.street_2 }}, 
+                {{donor.city}}, {{donor.state}} {{donor.zip}}</td>
+                {% else %}
+                <td>{{ donor.street_1 }}, {{donor.city}}, {{donor.state}} {{donor.zip}}</td>
+                {% endif %}
+                <td>{{ donor.email|replace_none:"" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+    </body>
+</html>

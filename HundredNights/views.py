@@ -37,13 +37,20 @@ def visit_report(request):
 def donation_report(request):
     renderer = ReportRenderer()
     output_format = request.GET.get('format', 'html')
+    report_type = request.GET.get('type', 'full')
     start_date = parser.parse(request.GET.get('start-date', 
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
-    if output_format == 'html':
-        return renderer.create_donation_report_html(start_date, end_date)
-    else:
-        return renderer.create_donation_report_csv(start_date, end_date)
+    if report_type == "full":
+        if output_format == 'html':
+            return renderer.create_donation_report_html(start_date, end_date)
+        else:
+            return renderer.create_donation_report_csv(start_date, end_date)
+    else: # mailing labels
+        if output_format == "html":
+            return renderer.create_mailing_label_report_html()
+        else:
+            return renderer.create_mailing_label_report_csv()
 
 @login_required
 def participation_report(request):

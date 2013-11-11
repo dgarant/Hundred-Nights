@@ -30,7 +30,7 @@ class ReportRenderer(object):
         writer = csv.writer(response)
         writer.writerow(field_names)
         for row in data:
-            writer.writerow([str(s) if s else "" for s in row])
+            writer.writerow([unicode(s).encode("ascii", "ignore") if s else "" for s in row])
         
         return response
 
@@ -85,6 +85,28 @@ class ReportRenderer(object):
                 "start_date" : datetime.strftime(start_date, '%Y-%m-%d'),
                 "end_date" : datetime.strftime(end_date, '%Y-%m-%d')
                }
+
+    def create_mailing_label_report_csv(self):
+        """ Returns a CSV formatted report with all donors' contact info"""
+        filename = "HundredNights-Donors-{0}.csv".format(datetime.now().strftime("%Y-%m-%d"))
+        donors = self.__create_mailing_label_report_data()
+        data = [[d.name, d.street_1, d.street_2, d.city, d.zip, d.state, 
+                 d.is_organization, d.email, d.organization_contact, d.title]
+                for d in donors]
+        return self.__render_to_csv(['Name', 'Street 1', 'Street 2', 'City', 'Zip', 
+                                     'State', 'Is Org?', 'Email', 'Org. Contact', 'Title'], 
+                                     data, filename)
+
+    def create_mailing_label_report_html(self):
+        """ Returns an HTML formatted report with all donors' contact info"""
+        data = self.__create_mailing_label_report_data()
+        return self.__render_to_html('mailing_labels.html', 
+            {"donors" : data, "created_date" : datetime.now().strftime("%Y-%m-%d")})
+        
+
+    def __create_mailing_label_report_data(self):
+        """ Creates data a report that lists all donors and contact info """
+        return Donor.objects.all()
 
     def create_donation_report_csv(self, start_date, end_date):
         data_dict = self.__create_donation_report_data(start_date, end_date)

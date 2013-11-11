@@ -2,6 +2,7 @@
 {% include "topmatter.html" %}
  
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="/static/js/knockout-3.0.0.js"></script>
 <script type="text/javascript">
     google.load("visualization", "1", {packages: ["corechart"]});
     google.setOnLoadCallback(drawCharts);
@@ -33,6 +34,10 @@
 
     $(document).ready(function() {
         $(".dp").datepicker();
+        var IndexViewModel = function() {
+            this.donation_report_type = ko.observable("full");
+        };
+        ko.applyBindings(new IndexViewModel());
     });
 </script>
 
@@ -76,13 +81,19 @@
             <option value="html">HTML</option>
             <option value="csv">Excel</option>
         </select>
+        <select name="type" id="temp" data-bind="value: donation_report_type">
+            <option value="full" selected="selected">Full</option>
+            <option value="mailinglabel">For Mailing Labels</option>
+        </select>
         <div style="display: block;"></div>
 
-        <span style="margin: 5px; font-weight: bold;">Start date</span>
-        <input style="margin: 5px;" type="text" name="start-date" class="dp" />
+        <div data-bind="visible: donation_report_type() == 'full'">
+            <span style="margin: 5px; font-weight: bold;">Start date</span>
+            <input style="margin: 5px;" type="text" name="start-date" class="dp" />
 
-        <span style="margin: 5px; font-weight: bold;">End date</span>
-        <input style="margin: 5px;" type="text" name="end-date" class="dp" />
+            <span style="margin: 5px; font-weight: bold;">End date</span>
+            <input style="margin: 5px;" type="text" name="end-date" class="dp" />
+        </div>
 
         <input type="submit" class="round-button" value="Run" />
     </form>
