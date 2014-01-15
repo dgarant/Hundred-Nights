@@ -2,11 +2,13 @@
 {% load tabindex from tag_extras %}
 {% load toticks from tag_extras %}
 {% load bool_yn from tag_extras %}
+{% load after_split_point from tag_extras %}
 {% include "topmatter.html" %}
 
 <form method="post" action="">
-    {{ form.non_field_errors }}
+    {{ formset.non_field_errors }}
     {% csrf_token %}
+
     <div class="right">
 
         {{ form.veteran.errors }}
@@ -49,6 +51,26 @@
         {{ form.gender|tabindex:5 }}
 
     </div>
+
+    <div style="clear: both; margin: 30px;">
+        {{ question_forms.management_form }}
+        {% for question in question_forms.forms %}
+            {% if forloop.first %}
+            <div class="right">
+            {% endif %}
+            {{ question.non_field_errors }}
+            {{ question.errors }}
+            {{ question.question.as_hidden }}
+            {{ question.id }}
+            {{ question.instance.question.prompt }}
+            {{ question.bool_response }}<br />
+            {% if forloop.counter|after_split_point:question_forms %}
+            </div><div class="left">
+            {% endif %}
+            {% if forloop.last %}</div>{% endif %}  
+        {% endfor %}
+       <div style="clear: both"></div>
+    </div> 
 </form>
 
 <script type="text/javascript">
@@ -111,7 +133,7 @@
                 /* Links */  null
             ]
         });
-        visit_table.fnSort([1, "asc"]);
+        visit_table.fnSort([[1, "asc"]]);
     });
 </script>
 {% endif %}

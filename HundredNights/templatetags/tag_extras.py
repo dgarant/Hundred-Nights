@@ -20,6 +20,10 @@ def bool_yn(bool_val):
         return "No"
 
 @register.filter
+def after_split_point(index, sequence):
+    return index >= len(sequence) / 2.0
+
+@register.filter
 def replace_none(val, replacement):
     if val:
         return val

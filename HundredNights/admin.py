@@ -13,3 +13,6 @@ admin.site.register(models.Volunteer)
 admin.site.register(models.VolunteerParticipation)
 admin.site.register(models.ParticipationType)
 
+admin.site.register(models.VisitorQuestion)
+admin.site.register(models.VisitorResponse)
+

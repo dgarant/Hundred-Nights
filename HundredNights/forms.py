@@ -1,6 +1,6 @@
 from django import forms
 from HundredNights.models import *
-
+from django.forms.models import modelformset_factory, inlineformset_factory
 
 class DonorForm(forms.ModelForm):
     class Meta:
@@ -27,6 +27,9 @@ class ParticipationForm(forms.ModelForm):
 class VisitorForm(forms.ModelForm):
     class Meta:
         model = Visitor
+
+VisitorQuestionForm = inlineformset_factory(Visitor, VisitorResponse, 
+                    extra=0, can_delete=False)
 
 class VisitForm(forms.ModelForm):
     class Meta:

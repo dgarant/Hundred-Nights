@@ -149,24 +149,50 @@ def visit_log(request):
 def edit_visitor(request, visitor_id=None):
     visitor = None
     try:
-        visitor = Visitor.objects.get(id=visitor_id)
+        visitor = Visitor.objects.select_related().get(id=visitor_id)
         visits = visitor.visit_set.all()
     except Visitor.DoesNotExist:
-        form = VisitorForm()
+        visitor = Visitor()
+        for question in VisitorQuestion.objects.all():
+            resp = VisitorResponse()
+            resp.visitor = visitor
+            resp.question = question
+            visitor.visitorresponse_set.add(resp)
+
+        form = VisitorForm(instance=visitor)
+        qforms = VisitorQuestionForm(instance=visitor)
         visits = []
 
     if request.method == "POST":
         form = VisitorForm(request.POST, request.FILES, instance=visitor)
-        if form.is_valid():
+        qforms = VisitorQuestionForm(request.POST, request.FILES, instance=visitor)
+        if form.is_valid() and qforms.is_valid():
             form.save()
+            qforms.save()
+            print(visitor)
+
             # on adds, re-render the page so donations can be added
             if visitor != None:
                 return redirect("visitors")
     elif visitor_id:
+        # attach new questions
+        new_questions = [q for q in VisitorQuestion.objects.all() 
+                        if not q in [r.question for r in visitor.visitorresponse_set.all()]]
+        for new_question in new_questions:
+            resp = VisitorResponse()
+            resp.visitor = visitor
+            resp.question = new_question
+            visitor.visitorresponse_set.add(resp)
+
         form = VisitorForm(instance=visitor)
+        qforms = VisitorQuestionForm(instance=visitor)
 
     return render(request, 'edit-visitor.html', 
-        {"form" : form, "visits" : visits})
+        {
+            "form" : form, 
+            "visits" : visits, 
+            "question_forms" : qforms,
+         })
 
 @login_required
 def delete_visitor(request, visitor_id):
