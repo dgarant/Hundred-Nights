@@ -72,6 +72,31 @@ class Visitor(models.Model):
 
     def __unicode__(self):
         return unicode(self.name)
+
+class VisitorQuestion(models.Model):
+    title = models.CharField(max_length=75,
+            verbose_name="Title")
+    prompt = models.CharField(max_length=200,
+            verbose_name="Prompt")
+    type = models.CharField(max_length=50, choices=(("CHECKBOX", "Check Box"), ))
+
+    class Meta:
+        verbose_name = "Visitor Question"
+
+    def __unicode__(self):
+        return unicode(self.title)
+
+class VisitorResponse(models.Model):
+    visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
+    question = models.ForeignKey(VisitorQuestion, verbose_name="Question")
+    bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
+
+    class Meta:
+        verbose_name = "Visitor Response"
+
+    def __unicode__(self):
+        return unicode(self.visitor) + u" - " + unicode(self.question)
+
     
 class VisitType(models.Model):
     type = models.CharField(max_length=50, unique=True, 
