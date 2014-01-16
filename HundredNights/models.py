@@ -129,6 +129,34 @@ class Visit(models.Model):
 
     def __unicode__(self):
         return unicode(self.visitor)
+
+class VisitQuestion(models.Model):
+    title = models.CharField(max_length=75,
+            verbose_name="Title")
+    prompt = models.CharField(max_length=200,
+            verbose_name="Prompt")
+    details_prompt = models.CharField(max_length=150,
+            verbose_name="Detail Prompt", null=True, blank=True)
+    type = models.CharField(max_length=50, choices=(("CHECKBOX", "Check Box"), 
+                            ("CHECKBOX-DETS", "Check Box with Details")))
+
+    class Meta:
+        verbose_name = "Visit Question"
+
+    def __unicode__(self):
+        return unicode(self.title)
+
+class VisitResponse(models.Model):
+    visit = models.ForeignKey(Visit, verbose_name="Visit")
+    question = models.ForeignKey(VisitQuestion, verbose_name="Question")
+    bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
+    details = models.TextField(verbose_name="Details", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Visit Response"
+
+    def __unicode__(self):
+        return unicode(self.visit) + u" - " + unicode(self.question)
     
 class Volunteer(models.Model):
     name = models.CharField(max_length=75, 

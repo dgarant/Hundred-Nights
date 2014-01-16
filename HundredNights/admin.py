@@ -16,3 +16,6 @@ admin.site.register(models.ParticipationType)
 admin.site.register(models.VisitorQuestion)
 admin.site.register(models.VisitorResponse)
 
+admin.site.register(models.VisitQuestion)
+admin.site.register(models.VisitResponse)
+

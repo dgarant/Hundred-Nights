@@ -151,39 +151,36 @@ def edit_visitor(request, visitor_id=None):
     try:
         visitor = Visitor.objects.select_related().get(id=visitor_id)
         visits = visitor.visit_set.all()
-    except Visitor.DoesNotExist:
-        visitor = Visitor()
-        for question in VisitorQuestion.objects.all():
-            resp = VisitorResponse()
-            resp.visitor = visitor
-            resp.question = question
-            visitor.visitorresponse_set.add(resp)
 
-        form = VisitorForm(instance=visitor)
-        qforms = VisitorQuestionForm(instance=visitor)
+        # attach new questions
+        new_questions = [q for q in VisitorQuestion.objects.all() 
+                        if not q in [r.question for r in visitor.visitorresponse_set.all()]]
+        for new_question in new_questions:
+            resp = VisitorResponse.objects.create(visitor=visitor, question=new_question)
+    except Visitor.DoesNotExist:
+        form = VisitorForm()
+        qforms = VisitorQuestionForm()
         visits = []
 
     if request.method == "POST":
         form = VisitorForm(request.POST, request.FILES, instance=visitor)
         qforms = VisitorQuestionForm(request.POST, request.FILES, instance=visitor)
         if form.is_valid() and qforms.is_valid():
-            form.save()
+            new_visitor = form.save()
             qforms.save()
-            print(visitor)
 
             # on adds, re-render the page so donations can be added
-            if visitor != None:
+            if visitor:
                 return redirect("visitors")
-    elif visitor_id:
-        # attach new questions
-        new_questions = [q for q in VisitorQuestion.objects.all() 
-                        if not q in [r.question for r in visitor.visitorresponse_set.all()]]
-        for new_question in new_questions:
-            resp = VisitorResponse()
-            resp.visitor = visitor
-            resp.question = new_question
-            visitor.visitorresponse_set.add(resp)
 
+            # attach new questions
+            new_questions = [q for q in VisitorQuestion.objects.all() 
+                            if not q in [r.question for r in new_visitor.visitorresponse_set.all()]]
+            for new_question in new_questions:
+                resp = VisitorResponse.objects.create(
+                        visitor=new_visitor, question=new_question)
+            qforms = VisitorQuestionForm(instance=new_visitor)
+    elif visitor_id:
         form = VisitorForm(instance=visitor)
         qforms = VisitorQuestionForm(instance=visitor)
 

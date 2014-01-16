@@ -5,8 +5,13 @@
 {% load after_split_point from tag_extras %}
 {% include "topmatter.html" %}
 
+{% if form.instance.id %}
+<form method="post" action="{% url edit-visitor form.instance.id %}">
+{% else %}
 <form method="post" action="">
-    {{ formset.non_field_errors }}
+{% endif %}
+    {{ form.non_field_errors }}
+    {{ form.errors }}
     {% csrf_token %}
 
     <div class="right">

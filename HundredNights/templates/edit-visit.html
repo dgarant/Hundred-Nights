@@ -10,9 +10,33 @@
     .right {
         width: 75%;
     }
+
+    textarea {
+        width: 250px;
+        height: 35px;
+    }
 </style>
 <form method="post" action="">
     {% csrf_token %}
+    <div class="right">
+        {{ responses.management_form }}
+        {% for response in responses.forms %}
+            <div style="margin: 10px">
+            {{ response.id }}
+            {{ response.question.as_hidden }}
+            {{ response.non_field_errors }}
+            {{ response.errors }}
+            {{ response.instance.question.prompt }}
+            {{ response.bool_response }}
+            {% if response.instance.question.type == "CHECKBOX-DETS" %}
+                <p>If yes, please describe:</p>
+                {{ response.details }}
+            {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="left">
     <p style="font-weight: bold;">Visitor: {{ visitor.name }}</p>
 
     {{ form.non_field_errors }}
@@ -34,7 +58,7 @@
         <a href="{% url edit-visitor visitor.id %}" class="round-button">Back to Visitor</a>
         <input type="submit" value="Save" class="round-button" />
     </div>
-
+    </div>
 
 </form>
 

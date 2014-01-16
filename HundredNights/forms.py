@@ -38,5 +38,8 @@ class VisitForm(forms.ModelForm):
             'visit' : forms.HiddenInput()
         }
 
+VisitQuestionForm = inlineformset_factory(Visit, VisitResponse,
+                    extra=0, can_delete=False)
+
 
         
