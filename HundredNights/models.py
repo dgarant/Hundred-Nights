@@ -4,6 +4,9 @@ from HundredNights.models import *
 from datetime import datetime
 
 class Donor(models.Model):
+    """ Represents a user who provided a monetary 
+        donation, a gift of an item, or simply a potential donor on the mailing list.
+    """
     name = models.CharField(max_length=75, 
         verbose_name="Donor Name", help_text="Enter the full name of the individual or organization")
     street_1 = models.CharField(max_length=50, 
@@ -34,6 +37,8 @@ class Donor(models.Model):
         return unicode(self.name)
     
 class Donation(models.Model):
+    """ Represents a monetary sum or an item that has been gifted. """
+
     donor = models.ForeignKey(Donor, verbose_name="Donor")
     amount = models.DecimalField(max_digits=15, 
         decimal_places=2, verbose_name="Amount (if monetary)",
@@ -55,6 +60,8 @@ class Donation(models.Model):
         return u"{0} - {1}".format(self.donor.name, self.date)
     
 class Visitor(models.Model):
+    """ Represents a guest of the shelter """
+
     name = models.CharField(max_length=75,
         verbose_name="Visitor Name")
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
@@ -74,6 +81,8 @@ class Visitor(models.Model):
         return unicode(self.name)
 
 class VisitorQuestion(models.Model):
+    """ A question which is recorded for all visitors """
+
     title = models.CharField(max_length=75,
             verbose_name="Title")
     prompt = models.CharField(max_length=200,
@@ -87,6 +96,7 @@ class VisitorQuestion(models.Model):
         return unicode(self.title)
 
 class VisitorResponse(models.Model):
+    """ A response to a visitor question """
     visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
     question = models.ForeignKey(VisitorQuestion, verbose_name="Question")
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
@@ -99,6 +109,7 @@ class VisitorResponse(models.Model):
 
     
 class VisitType(models.Model):
+    """ A service provided by the shelter during a visit """
     type = models.CharField(max_length=50, unique=True, 
         verbose_name="Visit Type")
 
@@ -109,6 +120,7 @@ class VisitType(models.Model):
         return unicode(self.type)
 
 class ParticipationType(models.Model):
+    """ A service provided by a shelter volunteer"""
     type = models.CharField(max_length=50, unique=True,
         verbose_name="Participation Type")
 
@@ -119,6 +131,7 @@ class ParticipationType(models.Model):
         return unicode(self.type)
 
 class Visit(models.Model):
+    """ A stop by a visitor at the shelter """
     visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
     date = models.DateField(verbose_name="Visit Date", default=datetime.now)
     visit_type = models.ForeignKey(VisitType, verbose_name="Visit Type")
@@ -131,6 +144,7 @@ class Visit(models.Model):
         return unicode(self.visitor)
 
 class VisitQuestion(models.Model):
+    """ A question which is asked every time a visitor stops at the shelter """
     title = models.CharField(max_length=75,
             verbose_name="Title")
     prompt = models.CharField(max_length=200,
@@ -147,6 +161,7 @@ class VisitQuestion(models.Model):
         return unicode(self.title)
 
 class VisitResponse(models.Model):
+    """ A response to a question which is asked at every visit """
     visit = models.ForeignKey(Visit, verbose_name="Visit")
     question = models.ForeignKey(VisitQuestion, verbose_name="Question")
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
@@ -159,6 +174,7 @@ class VisitResponse(models.Model):
         return unicode(self.visit) + u" - " + unicode(self.question)
     
 class Volunteer(models.Model):
+    """ An individual who donates time to the shelter """
     name = models.CharField(max_length=75, 
         verbose_name="Volunteer Name",
         help_text="Enter the full name of the volunteer or volunteer group")
@@ -189,6 +205,7 @@ class Volunteer(models.Model):
         return unicode(self.name)
     
 class VolunteerParticipation(models.Model):
+    """ An hourly log of a vsitor's stop at the shelter """
     date = models.DateField(verbose_name="Participation date")
     volunteer = models.ForeignKey(Volunteer, verbose_name="Volunteer")
     hours = models.DecimalField(max_digits=4, 

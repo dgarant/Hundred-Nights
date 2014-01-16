@@ -18,10 +18,12 @@ import csv, sys, os
 
 @login_required
 def index(request):
+    """ Returns a view of the dashboard"""
     return render(request, 'index.html', {})
 
 @login_required
 def visit_report(request):
+    """ Creates a report representing visits over a time period """
     renderer = ReportRenderer()
 
     output_format = request.GET.get('format', 'html')
@@ -35,12 +37,15 @@ def visit_report(request):
 
 @login_required
 def donation_report(request):
+    """ Creates a report representing donations over a time period """
     renderer = ReportRenderer()
     output_format = request.GET.get('format', 'html')
     report_type = request.GET.get('type', 'full')
+
     start_date = parser.parse(request.GET.get('start-date', 
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
+
     if report_type == "full":
         if output_format == 'html':
             return renderer.create_donation_report_html(start_date, end_date)
@@ -54,6 +59,7 @@ def donation_report(request):
 
 @login_required
 def participation_report(request):
+    """ Creates a report representing volunteer time within a date range"""
     renderer = ReportRenderer()
     output_format = request.GET.get('format', 'html')
     start_date = parser.parse(request.GET.get('start-date', 
@@ -66,6 +72,9 @@ def participation_report(request):
 
 @login_required
 def visits_by_month(request):
+    """ Creates a JSON result set indicating the 
+        number of visits over time
+    """
     cursor = connection.cursor()
     cursor.execute("""select 
                         to_char(date, 'MM-YYYY') as MonthName, 
@@ -80,6 +89,9 @@ def visits_by_month(request):
 
 @login_required
 def volunteer_hours_by_month(request):
+    """ Creates a JSON result set indicating the number of 
+        volunteer hours over time
+    """
     cursor = connection.cursor()
     cursor.execute("""select
                     to_char(date, 'MM-YYYY') as MonthName,
@@ -94,6 +106,16 @@ def volunteer_hours_by_month(request):
 
 @login_required
 def edit_visit(request, visitor_id, visit_id=None):
+    """ Create a view used to edit a visit for a particular visitor
+
+        Keyword arguments:
+            visitor_id -- The integer ID of the visitor to 
+                          add/edit/update the visit for
+            visit_id -- Primary key of the visit, 
+                        required to edit an existing visit.
+        Returns a view of the visitor on POST, 
+            or an edit page for the visit on GET
+    """
     visitor = Visitor.objects.get(id=visitor_id)
     visit = None
     try:
@@ -115,6 +137,12 @@ def edit_visit(request, visitor_id, visit_id=None):
 
 @login_required
 def delete_visit(request, visit_id):
+    """ Removes a visit from the database
+
+        Keyword arguments:
+            visit_id -- The primary key of the visit to delete
+        Returns a view of the visitor
+    """
     visit = Visit.objects.get(id=visit_id)
     visitor_id = visit.visitor.id
     visit.delete()
@@ -122,6 +150,14 @@ def delete_visit(request, visit_id):
 
 @login_required
 def visitor_check_in_resource(request, visitor_id):
+    """ Adds a visit to resource center for the 
+        specified visitor on the current date
+
+        Keyword arguments:
+            visitor_id -- The primary key of the visitor 
+                            to log a new visit for
+        Returns a view of the visitor with the newly added visit
+    """
     visitor = Visitor.objects.get(id=visitor_id)
     visit = Visit()
     visit.visitor = visitor
@@ -132,6 +168,14 @@ def visitor_check_in_resource(request, visitor_id):
 
 @login_required
 def visitor_check_in_overnight(request, visitor_id):
+    """ Adds an overnight visit for the 
+        specified visitor on the current date
+
+        Keyword arguments:
+            visitor_id -- The primary key of the visitor
+                            to log a new visit for
+        Returns a view of the visitor with the newly added visit
+    """
     visitor = Visitor.objects.get(id=visitor_id)
     visit = Visit()
     visit.visitor = visitor
@@ -142,11 +186,20 @@ def visitor_check_in_overnight(request, visitor_id):
 
 @login_required
 def visit_log(request):
+    """ Presents a view of all visitors """
     return render(request, 'visitor-list.html', 
             {"visitors" : Visitor.objects.all()})
 
 @login_required
 def edit_visitor(request, visitor_id=None):
+    """ Presents a view used to add or edit a visitor.
+
+        Keyword arguments:
+            visitor_id -- The primary key of the visitor to edit,   
+                            or None to perform an add
+        Returns a view used to edit the visitor on GET, or on POST, 
+                returns a rediection to the visitor list
+    """
     visitor = None
     try:
         visitor = Visitor.objects.select_related().get(id=visitor_id)
@@ -193,18 +246,34 @@ def edit_visitor(request, visitor_id=None):
 
 @login_required
 def delete_visitor(request, visitor_id):
+    """ Removes a visitor from the database
+
+        Keyword arguments:
+            visitor_id -- The ID of the visitor to 
+                            remove from the database
+        Returns a redirection to a view of the visitor list
+    """
     visitor = Visitor.objects.get(id=visitor_id)
     visitor.delete()
     return redirect("visitors")
 
 @login_required
 def volunteers(request):
+    """ Presents a list of volunteers """
     volunteers = Volunteer.objects.all()
     return render(request, 'volunteer-list.html', 
             {"volunteers" : volunteers})
 
 @login_required
 def edit_volunteer(request, volunteer_id=None):
+    """ Presents a view used to edit a volunteer
+
+        Keyword arguments:
+            volunteer_id -- The primary key of the volunteer 
+                        to edit, or None to perform an add
+        Returns a view used to edit the volunteer on GET, 
+            or a redirection to the volunteer list on POST
+    """
     volunteer = None
     try:
         volunteer = Volunteer.objects.get(id=volunteer_id)
@@ -229,12 +298,26 @@ def edit_volunteer(request, volunteer_id=None):
 
 @login_required
 def delete_volunteer(request, volunteer_id=None):
+    """ Deletes a volunteer from the database
+        Keyword arguments:
+            volunteer_id -- The primary key of the volunteer to delete
+        Returns a view of the list of volunteers
+    """
     volunteer = Volunteer.objects.get(id=volunteer_id)
     volunteer.delete()
     return redirect("volunteers")
 
 @login_required
 def edit_participation(request, volunteer_id, part_id=None):
+    """ Presents a view used to edit volunteer participation
+        Keyword arguments:
+            volunteer_id -- The primary key of the volunteer
+                    to add or edit participation for
+            part_id -- The primary key of the participation 
+                    to edit, or None to perform an add
+        Returns a view used to edit the volunteer on GET,
+            or a list of volunteers on POST
+    """
     volunteer = Volunteer.objects.get(id=volunteer_id)
     participation = None
     try:
@@ -256,6 +339,12 @@ def edit_participation(request, volunteer_id, part_id=None):
 
 @login_required
 def delete_participation(request, part_id=None):
+    """ Deletes a participation record.
+        Keyword arguments:
+            part_id -- The primary key of the 
+                participation record to delete
+        Returns a view used to edit the volunteer
+    """
     to_delete = VolunteerParticipation.objects.get(id=part_id)
     volunteer_id = to_delete.volunteer.id
     to_delete.delete()
@@ -263,11 +352,18 @@ def delete_participation(request, part_id=None):
 
 @login_required
 def donors(request):
+    """ Presents a list of donors """
     donors = Donor.objects.all()
     return render(request, 'donor-list.html', {"donors" : donors})
 
 @login_required
 def edit_donor(request, donor_id=None):
+    """ Presents a view used to edit a donor
+        Keyword arguments:
+            donor_id -- The primary key of the donor to edit
+        Returns an edit template, or on POST, 
+            a redirection to the donor list
+    """
     donor = None
     try:
         donor = Donor.objects.get(id=donor_id)
@@ -292,12 +388,26 @@ def edit_donor(request, donor_id=None):
 
 @login_required
 def delete_donor(request, donor_id):
+    """ Removes a donor from the databse
+        Keyword arguments:
+            donor_id -- The primary key of the donor to delete
+        Returns a redirection to a list of donors
+    """
     to_delete = Donor.objects.get(id=donor_id)
     to_delete.delete()
     return redirect("donors")
 
 @login_required
 def edit_donation(request, donor_id, donation_id=None):
+    """ Presents a page to edit a donation
+        Keyword arguments:
+            donor_id -- The primary key of the donor 
+                    to add or edit a donation for
+            donation_id -- The primary key of the donation to 
+                    edit, or None to perform an add
+        Returns an edit template for a donation on GET, 
+            or on POST a redirection to the donor list
+    """
     donor = Donor.objects.get(id=donor_id)
     donation = None
     try:
@@ -320,6 +430,12 @@ def edit_donation(request, donor_id, donation_id=None):
 
 @login_required
 def delete_donation(request, donation_id):
+    """ Deletes a donation from the database
+        Keyword arguments:
+            donation_id -- The primary key of 
+                            the donation to delete
+        Returns a view of a page used to edit the donor
+    """
     to_delete = Donation.objects.get(id=donation_id)
     donor_id = to_delete.donor.id
     to_delete.delete()
@@ -328,6 +444,7 @@ def delete_donation(request, donation_id):
 @login_required
 @csrf_protect
 def upload_donors(request):
+    """ Handles an upload of donors in a CSV format """
     row_num = 0
     for row in csv.DictReader(request.FILES["donor-csv"]):
         row_num += 1
@@ -386,6 +503,7 @@ def upload_donors(request):
 @login_required
 @csrf_protect
 def upload_visitors(request):
+    """ Handles an upload of visitors in a CSV format """
     gender_path = os.path.join(
         os.path.dirname(__file__), '..', 'Name-Gender-Guesser')
     sys.path.append(gender_path)
@@ -449,6 +567,7 @@ def upload_visitors(request):
 @login_required
 @csrf_protect
 def upload_volunteers(request):
+    """ Handles an upload of volunteers in a CSV format """
     for row in csv.DictReader(request.FILES["volunteer-csv"]):
         try:
             volunteer = Volunteer.objects.get(name=row["Person"])
