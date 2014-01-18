@@ -1,4 +1,9 @@
 Hundred-Nights
 ==============
 
-A web application used to manage data for the Hundred Nights homeless shelter in Keene, NH
+A simple Django application used to manage data for the Hundred Nights shelter in Keene, NH.
+
+Provides functionality to:
+  - Manage visitors, volunteers, and donors
+  - Administer per-visit or single-time questionaires
+  - Report on and export record sets
