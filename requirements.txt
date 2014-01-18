@@ -3,6 +3,7 @@ psycopg2
 gunicorn
 dj-database-url
 django-localflavor-us
+six
 python-dateutil
 django_extensions
 simplejson>=2.1
