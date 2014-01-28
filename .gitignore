@@ -4,3 +4,4 @@
 local_settings.py
 data.s3db
 activate.sh
+activate.bat
