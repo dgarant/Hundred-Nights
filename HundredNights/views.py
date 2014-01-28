@@ -116,24 +116,45 @@ def edit_visit(request, visitor_id, visit_id=None):
         Returns a view of the visitor on POST, 
             or an edit page for the visit on GET
     """
+    print("visit id: {0}".format(visit_id))
     visitor = Visitor.objects.get(id=visitor_id)
     visit = None
     try:
-        visit = Visit.objects.get(id=visit_id)
+        visit = Visit.objects.select_related().get(id=visit_id)
+
+        # attach new questions
+        new_questions = [q for q in VisitQuestion.objects.all()
+                 if not q in [r.question for r in visit.visitresponse_set.all()]]
+        for new_question in new_questions:
+            resp = VisitResponse.objects.create(visit=visit, question=new_question)
+
     except Visit.DoesNotExist:
         form = VisitForm(initial={'visitor' : visitor.pk})
+        qforms = VisitQuestionForm()
 
     if request.method == "POST":
         form = VisitForm(request.POST, request.FILES, instance=visit)
-        if form.is_valid():
-            form.save()
-            return redirect("edit-visitor", visitor_id=visitor_id)
+        qforms = VisitQuestionForm(request.POST, request.FILES, instance=visit)
+        if form.is_valid() and qforms.is_valid():
+            new_visit = form.save()
+            qforms.save()
+
+            # on adds, re-render the page so visit questions can be assigned
+            if visit:
+                return redirect("edit-visitor", visitor_id=visitor_id)
+
+            new_questions = [q for q in VisitQuestion.objects.all()
+                    if not q in [r.question for r in new_visit.visitresponse_set.all()]]
+            for new_question in new_questions:
+                resp = VisitResponse.objects.create(visit=new_visit, question=new_question)
+            qforms = VisitQuestionForm(instance=new_visit)
     elif visit_id:
         form = VisitForm(instance=visit, 
                     initial={'visitor' : visitor.pk})
+        qforms = VisitQuestionForm(instance=visit)
 
     return render(request, 'edit-visit.html',
-        {"form" : form, "visitor" : visitor})
+        {"form" : form, "visitor" : visitor, "responses" : qforms})
 
 @login_required
 def delete_visit(request, visit_id):
