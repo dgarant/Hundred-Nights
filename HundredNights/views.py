@@ -80,8 +80,8 @@ def visits_by_month(request):
                         to_char(date, 'MM-YYYY') as MonthName, 
                         count(*) as VisitCount
                       from "HundredNights_visit"
-                      group by to_char(date, 'YYYY-MM'), MonthName
-                      order by to_char(date, 'YYYY-MM')
+                      group by to_char(date, 'MM-YYYY'), MonthName
+                      order by to_char(date, 'MM-YYYY')
                       """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results), 
@@ -307,10 +307,17 @@ def edit_volunteer(request, volunteer_id=None):
     if request.method == "POST":
         form = VolunteerForm(request.POST, request.FILES, instance=volunteer)
         if form.is_valid():
-            form.save()
-            # on adds, re-render the page so donations can be added
+            svol = form.save()
+
+            # on adds, re-render the page so participation can be added
             if volunteer != None:
                 return redirect("volunteers")
+            else: # set up the volunteer as a donor also
+                donor = Donor(name=svol.name, street_1=svol.street_1, 
+                                street_2=svol.street_2, city=svol.town, 
+                                state=svol.state, zip=svol.zip)
+                donor.save()
+
     elif volunteer_id:
         form = VolunteerForm(instance=volunteer)
 

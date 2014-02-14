@@ -10,17 +10,17 @@
     <div class="right">
 
         {{ form.is_organization.errors }}
-        {{ form.is_organization|tabindex:7 }}
+        {{ form.is_organization|tabindex:8 }}
         <label for="id_is_organization" style="display: inline;">
         Is this an organization?</label>
 
         <label for="id_email">Email:</label>
         {{ form.email.errors }}
-        {{ form.email|tabindex:8 }}
+        {{ form.email|tabindex:9 }}
 
         <label for="id_organization_contact">Contact (for organization):</label>
         {{ form.organization_contact.errors }}
-        {{ form.organization_contact|tabindex:9 }}
+        {{ form.organization_contact|tabindex:10 }}
 
         <div style="display: block;">
             <a href="{% url donors %}" style="margin-top: 15px" class="round-button">Back to List</a>
@@ -40,17 +40,21 @@
         {{ form.street_1.errors }}
         {{ form.street_1|tabindex:3 }}
 
+        <label for="id_street2">Street 2:</label>
+        {{ form.street_2.errors }}
+        {{ form.street_2|tabindex:4 }}
+
         <label for="id_city">City:</label>
         {{ form.city.errors }}
-        {{ form.city|tabindex:4 }}
+        {{ form.city|tabindex:5 }}
 
         <label for="id_zip">Zip:</label>
         {{ form.zip.errors }}
-        {{ form.zip|tabindex:5 }}
+        {{ form.zip|tabindex:6 }}
 
         <label for="id_state">State:</label>
         {{ form.state.errors }}
-        {{ form.state|tabindex:6 }}
+        {{ form.state|tabindex:7 }}
 
     </div>
 </form>
