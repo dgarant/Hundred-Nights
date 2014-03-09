@@ -52,11 +52,13 @@ class ReportRenderer(object):
         visitors_by_id_town = defaultdict(int)
         visitors_by_resid_town = defaultdict(int)
 
+        num_unique_visitors = 0
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
             if visitor.visit_set.filter(
                  date__gte = start_date, date__lte = end_date).count() == 0:
                  continue
+            num_unique_visitors += 1
             visitors_by_id_town[visitor.town_of_id] += 1
             visitors_by_resid_town[visitor.town_of_residence] += 1
             for response in visitor.visitorresponse_set.filter(
@@ -64,10 +66,9 @@ class ReportRenderer(object):
                             bool_response=True).all():
                 visitor_questions[response.question.prompt] += 1
             
-        print(visitors_by_id_town)
-        print(visitors_by_resid_town)
         return self.__render_to_html("united_way_report.html", 
-                {"visit_questions" : visit_questions, 
+                {"num_unique_visitors" : num_unique_visitors,
+                 "visit_questions" : visit_questions, 
                  "start_date" : datetime.date(start_date), 
                  "end_date" : datetime.date(end_date),
                  "visitor_questions" : dict(visitor_questions),
