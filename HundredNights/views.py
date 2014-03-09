@@ -88,11 +88,11 @@ def visits_by_month(request):
     """
     cursor = connection.cursor()
     cursor.execute("""select 
-                        to_char(date, 'MM-YYYY') as MonthName, 
+                        to_char(date, 'YYYY-MM') as MonthName, 
                         count(*) as VisitCount
                       from "HundredNights_visit"
-                      group by to_char(date, 'MM-YYYY'), MonthName
-                      order by to_char(date, 'MM-YYYY')
+                      group by to_char(date, 'YYYY-MM'), MonthName
+                      order by to_char(date, 'YYYY-MM')
                       """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results), 
@@ -105,7 +105,7 @@ def volunteer_hours_by_month(request):
     """
     cursor = connection.cursor()
     cursor.execute("""select
-                    to_char(date, 'MM-YYYY') as MonthName,
+                    to_char(date, 'YYYY-MM') as MonthName,
                     sum(hours * coalesce(num_participants, 1)) as Hours
                     from "HundredNights_volunteerparticipation"
                     group by to_char(date, 'YYYY-MM'), MonthName
@@ -127,7 +127,6 @@ def edit_visit(request, visitor_id, visit_id=None):
         Returns a view of the visitor on POST, 
             or an edit page for the visit on GET
     """
-    print("visit id: {0}".format(visit_id))
     visitor = Visitor.objects.get(id=visitor_id)
     visit = None
     try:
