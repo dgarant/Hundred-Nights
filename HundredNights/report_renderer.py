@@ -1,6 +1,7 @@
 import locale # for formatting
 
 import os
+import datetime
 from io import BytesIO
 from io import StringIO
 import csv
@@ -33,6 +34,45 @@ class ReportRenderer(object):
             writer.writerow([unicode(s).encode("ascii", "ignore") if s else "" for s in row])
         
         return response
+
+    def create_united_way_report_html(self, start_date, end_date):
+        """ Builds a page from an HTML template """
+        visit_questions = dict()
+        for question in VisitQuestion.objects.all():
+            num_resp = question.visitresponse_set.filter(
+                visit__date__gt=start_date,
+                visit__date__lt=end_date,
+                bool_response=True).count()
+            visit_questions[question.prompt] = num_resp
+
+        questions = VisitorQuestion.objects.all()
+        question_ids = set(questions.values_list('id', flat=True).distinct())
+
+        visitor_questions = dict([(q.prompt, 0) for q in questions])
+        visitors_by_id_town = defaultdict(int)
+        visitors_by_resid_town = defaultdict(int)
+
+        for visitor in Visitor.objects \
+                        .prefetch_related("visit_set", "visitorresponse_set"):
+            if visitor.visit_set.filter(
+                 date__gte = start_date, date__lte = end_date).count() == 0:
+                 continue
+            visitors_by_id_town[visitor.town_of_id] += 1
+            visitors_by_resid_town[visitor.town_of_residence] += 1
+            for response in visitor.visitorresponse_set.filter(
+                            question__id__in = question_ids, 
+                            bool_response=True).all():
+                visitor_questions[response.question.prompt] += 1
+            
+        print(visitors_by_id_town)
+        print(visitors_by_resid_town)
+        return self.__render_to_html("united_way_report.html", 
+                {"visit_questions" : visit_questions, 
+                 "start_date" : datetime.date(start_date), 
+                 "end_date" : datetime.date(end_date),
+                 "visitor_questions" : dict(visitor_questions),
+                 "visitors_by_id_town" : dict(visitors_by_id_town),
+                 "visitors_by_resid_town" : dict(visitors_by_resid_town)})
 
     def create_visit_report_csv(self, start_date, end_date):
         data_dict = self.__create_visit_report_data(start_date, end_date)

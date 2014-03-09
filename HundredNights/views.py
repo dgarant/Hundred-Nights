@@ -22,6 +22,17 @@ def index(request):
     return render(request, 'index.html', {})
 
 @login_required
+def united_way_report(request):
+    """ Creates a report representing responses to 
+        per-visit and one-time questions over a time window
+    """
+    renderer = ReportRenderer()
+    start_date = parser.parse(request.GET.get('start-date', 
+        datetime.now() - timedelta(days=30)))
+    end_date = parser.parse(request.GET.get('end-date', datetime.now()))
+    return renderer.create_united_way_report_html(start_date, end_date)
+
+@login_required
 def visit_report(request):
     """ Creates a report representing visits over a time period """
     renderer = ReportRenderer()

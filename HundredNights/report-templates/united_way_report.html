@@ -1,0 +1,89 @@
+{% load tag_extras %}
+
+{% include "report_header.html" %}
+
+    <div style="width: 800px; margin: 0 auto;">
+    <h1>United Way Report: {{ start_date }} through {{ end_date }}</h1>
+    <hr/>
+
+
+        <h2>One-time Responses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Prompt</th>
+                    <th>Affirmative Responses</th>
+                </tr>
+                <tr>
+            </thead>
+            <tbody>
+                {% for prompt, count in visitor_questions.items %}
+                    <tr>
+                        <td>{{ prompt }}</td>
+                        <td>{{ count }} </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+        <h2>Per-Visit Responses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Prompt</th>
+                    <th>Affirmative Responses</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for prompt, count in visit_questions.items %}
+            <tr>
+                <td>{{ prompt }}</td>
+                <td>{{ count }}</td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Unique Visitors by Town of ID</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Town of ID</th>
+                    <th>Unique Visitors</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for town, count in visitors_by_id_town.items %}
+                <tr>
+                    <td>{{ town }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        Number of unique towns of ID: {{ visitors_by_id_town|length }}
+
+        <h2>Unique Visitors by Town of Residence</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Town of Residence</th>
+                    <th>Unique Visitors</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for town, count in visitors_by_resid_town.items %}
+                <tr>
+                    <td>{{ town }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        Number of unique towns of residence: {{ visitors_by_resid_town|length }}
+        </div>
+
+    </body>
+</html>
+

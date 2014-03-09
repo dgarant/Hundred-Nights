@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'visit-report/$', visit_report, name='visit-report'),
     url(r'donation-report/$', donation_report, name='donation-report'),
     url(r'participation-report/$', participation_report, name='participation-report'),
+    url(r'united-way-report/$', united_way_report, name='united-way-report'),
 
     # JSON feeds for charting
     url(r'^visits-by-month/$', visits_by_month, name='visits-by-month'),
