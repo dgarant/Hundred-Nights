@@ -2,11 +2,20 @@
 
 {% include "report_header.html" %}
 
+    <style type="text/css">
+        div.spacer {
+            margin: 5em;
+        }
+    </style>
+
     <div style="width: 800px; margin: 0 auto;">
     <h1>United Way Report: {{ start_date }} through {{ end_date }}</h1>
+    <h1>{{ visit_type_name }}</h1>
     <hr/>
 
         <h2>{{ num_unique_visitors }} Unique Visitors</h2>
+
+        <div class="spacer"></div>
 
         <h2>One-time Responses</h2>
         <table>
@@ -27,6 +36,7 @@
             </tbody>
         </table>
 
+        <div class="spacer"></div>
 
         <h2>Per-Visit Responses</h2>
         <table>
@@ -34,17 +44,21 @@
                 <tr>
                     <th>Prompt</th>
                     <th>Affirmative Responses</th>
+                    <th>Unique Respondents</th>
                 </tr>
             </thead>
             <tbody>
-        {% for prompt, count in visit_questions.items %}
+        {% for prompt, count, unique_visitors in visit_questions %}
             <tr>
                 <td>{{ prompt }}</td>
                 <td>{{ count }}</td>
+                <td>{{ unique_visitors }}</td>
             </tr>
         {% endfor %}
             </tbody>
         </table>
+
+        <div class="spacer"></div>
 
         <h2>Unique Visitors by Town of ID</h2>
         <table>
@@ -55,7 +69,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for town, count in visitors_by_id_town.items %}
+            {% for town, count in visitors_by_id_town %}
                 <tr>
                     <td>{{ town }}</td>
                     <td>{{ count }}</td>
@@ -64,6 +78,8 @@
             </tbody>
         </table>
         Number of unique towns of ID: {{ visitors_by_id_town|length }}
+
+        <div class="spacer"></div>
 
         <h2>Unique Visitors by Town of Residence</h2>
         <table>
@@ -74,7 +90,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for town, count in visitors_by_resid_town.items %}
+            {% for town, count in visitors_by_resid_town %}
                 <tr>
                     <td>{{ town }}</td>
                     <td>{{ count }}</td>
