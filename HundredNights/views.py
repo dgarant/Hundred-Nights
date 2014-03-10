@@ -5,6 +5,7 @@ from HundredNights.forms import *
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime, timedelta
 from dateutil import parser
+from django.db import DatabaseError
 from django.db.models import Sum, Count
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.forms import widgets
@@ -30,7 +31,10 @@ def united_way_report(request):
     start_date = parser.parse(request.GET.get('start-date', 
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
-    return renderer.create_united_way_report_html(start_date, end_date)
+    visit_type = VisitType.objects.get(
+                type=request.GET.get("visit-type"))
+    return renderer.create_united_way_report_html(
+                start_date, end_date, visit_type)
 
 @login_required
 def visit_report(request):
@@ -87,13 +91,23 @@ def visits_by_month(request):
         number of visits over time
     """
     cursor = connection.cursor()
-    cursor.execute("""select 
-                        to_char(date, 'YYYY-MM') as MonthName, 
-                        count(*) as VisitCount
-                      from "HundredNights_visit"
-                      group by to_char(date, 'YYYY-MM'), MonthName
-                      order by to_char(date, 'YYYY-MM')
-                      """)
+    try:
+        cursor.execute("""select 
+                            to_char(date, 'YYYY-MM') as MonthName, 
+                            count(*) as VisitCount
+                          from "HundredNights_visit"
+                          group by to_char(date, 'YYYY-MM'), MonthName
+                          order by to_char(date, 'YYYY-MM')
+                          """)
+    except DatabaseError:
+        cursor.execute("""
+            select 
+                strftime('%%Y-%%m', date) as MonthName,
+                count(*) as VisitCount
+              from "HundredNights_visit"
+                group by strftime('%%Y-%%m', date), MonthName
+                order by strftime('%%Y-%%m', date)
+              """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results), 
             content_type='application/json')
@@ -104,12 +118,23 @@ def volunteer_hours_by_month(request):
         volunteer hours over time
     """
     cursor = connection.cursor()
-    cursor.execute("""select
-                    to_char(date, 'YYYY-MM') as MonthName,
-                    sum(hours * coalesce(num_participants, 1)) as Hours
+    try:
+        cursor.execute("""
+                    select
+                        to_char(date, 'YYYY-MM') as MonthName,
+                        sum(hours * coalesce(num_participants, 1)) as Hours
                     from "HundredNights_volunteerparticipation"
                     group by to_char(date, 'YYYY-MM'), MonthName
                     order by to_char(date, 'YYYY-MM')
+                    """)
+    except DatabaseError: #support either postgres or sqlite with raw SQL
+        cursor.execute("""
+                    select
+                        strftime('%%Y-%%m', date) as MonthName,
+                        sum(hours * coalesce(num_participants, 1)) as Hours
+                    from "HundredNights_volunteerparticipation"
+                    group by strftime('%%Y-%%m', date), MonthName
+                    order by strftime('%%Y-%%m', date)
                     """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results, use_decimal=True),

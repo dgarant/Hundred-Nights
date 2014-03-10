@@ -8,27 +8,35 @@
     google.setOnLoadCallback(drawCharts);
     function drawCharts() {
         $.getJSON("{% url visits-by-month %}", function(data) {
-            data.unshift(['Month', 'Visit Count'])
-            var tableData = google.visualization.arrayToDataTable(data)
-            var chart = new google.visualization.LineChart(
-                    document.getElementById('visits-by-month'));
-            var options = {
-                title: 'Visits by Month',
-                legend : { position : "none" }
-            };
-            chart.draw(tableData, options);
+            var newLength = data.unshift(['Month', 'Visit Count'])
+            if(newLength > 1) {
+                var tableData = google.visualization.arrayToDataTable(data)
+                var chart = new google.visualization.LineChart(
+                        document.getElementById('visits-by-month'));
+                var options = {
+                    title: 'Visits by Month',
+                    legend : { position : "none" }
+                };
+                chart.draw(tableData, options);
+            } else {
+                $("#visits-by-month").html("No visit data");
+            }
         });
 
         $.getJSON("{% url volunteer-hours-by-month %}", function(data) {
-            data.unshift(['Month', 'Volunteer Hours'])
-            var tableData = google.visualization.arrayToDataTable(data);
-            var chart = new google.visualization.LineChart(
-                document.getElementById('volunteer-hours-by-month'));
-            var options = {
-                title : 'Volunteer Hours by Month',
-                legend : { position : "none" }
-            };
-            chart.draw(tableData, options);
+            var newLength = data.unshift(['Month', 'Volunteer Hours'])
+            if(newLength > 1) {
+                var tableData = google.visualization.arrayToDataTable(data);
+                var chart = new google.visualization.LineChart(
+                    document.getElementById('volunteer-hours-by-month'));
+                var options = {
+                    title : 'Volunteer Hours by Month',
+                    legend : { position : "none" }
+                };
+                chart.draw(tableData, options);
+            } else {
+                $("#volunteer-hours-by-month").html("No volunteer data");
+            }
         });
     }
 
@@ -125,6 +133,12 @@
     <legend>United Way Report</legend>
     <form action="{% url united-way-report %}" target="_blank" method="get">
         
+       <div style="display: inline-block;">
+            <select name="visit-type" id="visit-type">
+                <option value="Resource Center">Resource Center</option>
+                <option value="Overnight">Overnight</option>
+            </select>
+        </div>
         <div style="display: inline-block;">
             <span style="margin: 5px; font-weight: bold;">Start date</span>
             <input style="margin: 5px;" type="text" name="start-date" class="dp" />

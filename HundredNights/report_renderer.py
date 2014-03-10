@@ -35,15 +35,23 @@ class ReportRenderer(object):
         
         return response
 
-    def create_united_way_report_html(self, start_date, end_date):
+    def create_united_way_report_html(self, start_date, end_date, visit_type):
         """ Builds a page from an HTML template """
-        visit_questions = dict()
+        visit_questions = [] # contianing tuples (prompt, count, distinct users)
         for question in VisitQuestion.objects.all():
-            num_resp = question.visitresponse_set.filter(
+            responses = question.visitresponse_set. \
+                select_related("visit").filter(
                 visit__date__gt=start_date,
                 visit__date__lt=end_date,
-                bool_response=True).count()
-            visit_questions[question.prompt] = num_resp
+                visit__visit_type_id=visit_type.id,
+                bool_response=True).all()
+            visitor_ids = set()
+            for resp in responses:
+                visitor_ids.add(resp.visit.visitor_id)
+
+            if responses.count() > 0:
+                visit_questions.append(
+                    (question.prompt, responses.count(), len(visitor_ids)))
 
         questions = VisitorQuestion.objects.all()
         question_ids = set(questions.values_list('id', flat=True).distinct())
@@ -56,11 +64,13 @@ class ReportRenderer(object):
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
             if visitor.visit_set.filter(
-                 date__gte = start_date, date__lte = end_date).count() == 0:
+                 date__gte = start_date, 
+                 date__lte = end_date,
+                 visit_type__id = visit_type.id).count() == 0:
                  continue
             num_unique_visitors += 1
-            visitors_by_id_town[visitor.town_of_id] += 1
-            visitors_by_resid_town[visitor.town_of_residence] += 1
+            visitors_by_id_town[visitor.town_of_id.upper()] += 1
+            visitors_by_resid_town[visitor.town_of_residence.upper()] += 1
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 
                             bool_response=True).all():
@@ -68,12 +78,13 @@ class ReportRenderer(object):
             
         return self.__render_to_html("united_way_report.html", 
                 {"num_unique_visitors" : num_unique_visitors,
-                 "visit_questions" : visit_questions, 
+                 "visit_questions" : sorted(visit_questions), 
                  "start_date" : datetime.date(start_date), 
                  "end_date" : datetime.date(end_date),
-                 "visitor_questions" : dict(visitor_questions),
-                 "visitors_by_id_town" : dict(visitors_by_id_town),
-                 "visitors_by_resid_town" : dict(visitors_by_resid_town)})
+                 "visitor_questions" : sorted(visitor_questions.iteritems()),
+                 "visitors_by_id_town" : sorted(visitors_by_id_town.iteritems()),
+                 "visitors_by_resid_town" : sorted(visitors_by_resid_town.iteritems()),
+                 "visit_type_name" : visit_type.type})
 
     def create_visit_report_csv(self, start_date, end_date):
         data_dict = self.__create_visit_report_data(start_date, end_date)
