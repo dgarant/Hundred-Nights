@@ -4,7 +4,7 @@
 {% load bool_yn from tag_extras %}
 {% include "topmatter.html" %}
 
-<form method="post" action="">
+<form method="post" action="" id="donor-form">
     {{ form.non_field_errors }}
     {% csrf_token %}
     <div class="right">
@@ -63,7 +63,7 @@
 <fieldset style="clear: both;"> 
     <legend>Donations</legend>
 
-    <a href="{% url add-donation form.instance.id %}" class="round-button">Add Donation</a>
+    <a href="{% url add-donation form.instance.id %}" id="add-donation-button" class="round-button">Add Donation</a>
 
     <table class="donation-table">
         <thead>
@@ -94,17 +94,28 @@
 </fieldset>
 
 <script type="text/javascript">
-    var donation_table = $(".donation-table").dataTable({
-        "bLengthChange" : false,
-        "iDisplayLength": 1000,
-        "sDom": 'T<"clear">lfrtip',
-        "bFilter" : false,
-        "bPaginate" : false,
-        "bInfo" : false,
-        "oTableTools": {
-            "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
-            "aButtons" : [ ]
-        }
+    $(document).ready(function() {
+        var donation_table = $(".donation-table").dataTable({
+            "bLengthChange" : false,
+            "iDisplayLength": 1000,
+            "sDom": 'T<"clear">lfrtip',
+            "bFilter" : false,
+            "bPaginate" : false,
+            "bInfo" : false,
+            "oTableTools": {
+                "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                "aButtons" : [ ]
+            }
+        });
+
+       $("#add-donation-button").click(function(e) {
+            $.ajax({
+                url: "{% url edit-donor form.instance.id %}", 
+                data: $("#donor-form").serialize(),
+                type: "POST",
+                async: false
+            });
+       });
     });
 </script>
 {% endif %}
