@@ -14,6 +14,7 @@
     <hr/>
 
         <h2>{{ num_unique_visitors }} Unique Visitors</h2>
+        <h2>{{ total_visits }} Visits Overall</h2>
 
         <div class="spacer"></div>
 
@@ -60,19 +61,21 @@
 
         <div class="spacer"></div>
 
-        <h2>Unique Visitors by Town of ID</h2>
+        <h2>Visits by Town of ID</h2>
         <table>
             <thead>
                 <tr>
                     <th>Town of ID</th>
                     <th>Unique Visitors</th>
+                    <th>Total Visits</th>
                 </tr>
             </thead>
             <tbody>
-            {% for town, count in visitors_by_id_town %}
+            {% for town, unique_count, total_count in visitors_by_id_town %}
                 <tr>
                     <td>{{ town }}</td>
-                    <td>{{ count }}</td>
+                    <td>{{ unique_count }}</td>
+                    <td>{{ total_count }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -81,19 +84,21 @@
 
         <div class="spacer"></div>
 
-        <h2>Unique Visitors by Town of Residence</h2>
+        <h2>Visits by Town of Residence</h2>
         <table>
             <thead>
                 <tr>
                     <th>Town of Residence</th>
                     <th>Unique Visitors</th>
+                    <th>Total Visits</th>
                 </tr>
             </thead>
             <tbody>
-            {% for town, count in visitors_by_resid_town %}
+            {% for town, unique_count, total_count in visitors_by_resid_town %}
                 <tr>
                     <td>{{ town }}</td>
-                    <td>{{ count }}</td>
+                    <td>{{ unique_count }}</td>
+                    <td>{{ total_count }}</td>
                 </tr>
             {% endfor %}
             </tbody>

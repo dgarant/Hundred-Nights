@@ -57,20 +57,29 @@ class ReportRenderer(object):
         question_ids = set(questions.values_list('id', flat=True).distinct())
 
         visitor_questions = dict([(q.prompt, 0) for q in questions])
-        visitors_by_id_town = defaultdict(int)
-        visitors_by_resid_town = defaultdict(int)
+        # maps from town to [num. unique visitors, total visits]
+        visitors_by_id_town = defaultdict(lambda: [0, 0])
+        visitors_by_resid_town = defaultdict(lambda: [0, 0])
 
+        overall_total_visits = 0
         num_unique_visitors = 0
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
-            if visitor.visit_set.filter(
+            num_visits = visitor.visit_set.filter(
                  date__gte = start_date, 
                  date__lte = end_date,
-                 visit_type__id = visit_type.id).count() == 0:
+                 visit_type__id = visit_type.id).count()
+            if num_visits == 0:
                  continue
             num_unique_visitors += 1
-            visitors_by_id_town[visitor.town_of_id.upper()] += 1
-            visitors_by_resid_town[visitor.town_of_residence.upper()] += 1
+            overall_total_visits += num_visits
+
+            unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper()]
+            visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
+
+            unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper()]
+            visitors_by_resid_town[visitor.town_of_residence.upper()] = [unique_visits+1, total_visits+num_visits]
+
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 
                             bool_response=True).all():
@@ -78,12 +87,13 @@ class ReportRenderer(object):
             
         return self.__render_to_html("united_way_report.html", 
                 {"num_unique_visitors" : num_unique_visitors,
+                "total_visits" : overall_total_visits,
                  "visit_questions" : sorted(visit_questions), 
                  "start_date" : datetime.date(start_date), 
                  "end_date" : datetime.date(end_date),
                  "visitor_questions" : sorted(visitor_questions.iteritems()),
-                 "visitors_by_id_town" : sorted(visitors_by_id_town.iteritems()),
-                 "visitors_by_resid_town" : sorted(visitors_by_resid_town.iteritems()),
+                 "visitors_by_id_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_id_town.iteritems()]),
+                 "visitors_by_resid_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_resid_town.iteritems()]),
                  "visit_type_name" : visit_type.type})
 
     def create_visit_report_csv(self, start_date, end_date):
