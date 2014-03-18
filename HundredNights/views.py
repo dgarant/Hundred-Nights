@@ -220,7 +220,7 @@ def visitor_check_in_resource(request, visitor_id):
     visit.date = datetime.now()
     visit.visit_type = VisitType.objects.get(type="Resource Center")
     visit.save()
-    return redirect('edit-visitor', visitor_id=visitor_id)
+    return redirect('edit-visit', visitor_id=visitor_id, visit_id=visit.id)
 
 @login_required
 def visitor_check_in_overnight(request, visitor_id):
@@ -238,7 +238,7 @@ def visitor_check_in_overnight(request, visitor_id):
     visit.date = datetime.now()
     visit.visit_type = VisitType.objects.get(type="Overnight")
     visit.save()
-    return redirect('edit-visitor', visitor_id=visitor_id)
+    return redirect('edit-visit', visitor_id=visitor_id, visit_id=visit.id)
 
 @login_required
 def visit_log(request):
