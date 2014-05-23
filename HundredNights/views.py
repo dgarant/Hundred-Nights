@@ -20,7 +20,7 @@ import csv, sys, os
 @login_required
 def index(request):
     """ Returns a view of the dashboard"""
-    return render(request, 'index.html', {})
+    return render(request, 'index.html', {"visit_types" : VisitType.objects.all()})
 
 @login_required
 def united_way_report(request):
@@ -31,8 +31,7 @@ def united_way_report(request):
     start_date = parser.parse(request.GET.get('start-date', 
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
-    visit_type = VisitType.objects.get(
-                type=request.GET.get("visit-type"))
+    visit_type = VisitType.objects.get(id=request.GET.get("visit-type"))
     return renderer.create_united_way_report_html(
                 start_date, end_date, visit_type)
 

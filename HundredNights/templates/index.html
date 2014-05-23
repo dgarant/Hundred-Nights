@@ -135,8 +135,9 @@
         
        <div style="display: inline-block;">
             <select name="visit-type" id="visit-type">
-                <option value="Resource Center">Resource Center</option>
-                <option value="Overnight">Overnight</option>
+                {% for vtype in visit_types %}
+                    <option value="{{vtype.id}}">{{vtype.type}}</option>
+                {% endfor %}
             </select>
         </div>
         <div style="display: inline-block;">
