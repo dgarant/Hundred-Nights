@@ -390,12 +390,6 @@ def edit_volunteer(request, volunteer_id=None):
             # on adds, re-render the page so participation can be added
             if volunteer != None:
                 return redirect("volunteers")
-            else: # set up the volunteer as a donor also
-                donor = Donor(name=svol.name, street_1=svol.street_1, 
-                                street_2=svol.street_2, city=svol.town, 
-                                state=svol.state, zip=svol.zip)
-                donor.save()
-
     elif volunteer_id:
         form = VolunteerForm(instance=volunteer)
 
