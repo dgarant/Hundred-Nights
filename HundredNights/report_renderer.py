@@ -56,7 +56,7 @@ class ReportRenderer(object):
         questions = VisitorQuestion.objects.all()
         question_ids = set(questions.values_list('id', flat=True).distinct())
 
-        visitor_questions = dict([(q.prompt, 0) for q in questions])
+        visitor_questions = dict([(q, 0) for q in questions])
         # maps from town to [num. unique visitors, total visits]
         visitors_by_id_town = defaultdict(lambda: [0, 0])
         visitors_by_resid_town = defaultdict(lambda: [0, 0])
@@ -83,7 +83,7 @@ class ReportRenderer(object):
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 
                             bool_response=True).all():
-                visitor_questions[response.question.prompt] += 1
+                visitor_questions[response.question] += 1
             
         return self.__render_to_html("united_way_report.html", 
                 {"num_unique_visitors" : num_unique_visitors,
@@ -94,7 +94,7 @@ class ReportRenderer(object):
                  "visitor_questions" : sorted(visitor_questions.iteritems()),
                  "visitors_by_id_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_id_town.iteritems()]),
                  "visitors_by_resid_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_resid_town.iteritems()]),
-                 "visit_type_name" : visit_type.type})
+                 "visit_type" : visit_type})
 
     def create_visit_report_csv(self, start_date, end_date):
         data_dict = self.__create_visit_report_data(start_date, end_date)
@@ -203,11 +203,11 @@ class ReportRenderer(object):
         for q in [p[1] for p in data_dict["part_info"]]:
             part = part | q
         filename = 'HundredNightsParticipation-{0}-thru-{1}.csv'.format(data_dict['start_date'], data_dict['end_date'])
-        data = [[p.volunteer.name, p.volunteer.age, p.volunteer.street_1, p.volunteer.street_2,
+        data = [[p.volunteer.name, p.volunteer.date_of_birth, p.volunteer.street_1, p.volunteer.street_2,
                  p.volunteer.zip, p.volunteer.state, p.volunteer.is_group, 
                  p.date, p.hours, p.num_participants, p.participation_type, p.comment]
                 for p in part]
-        return self.__render_to_csv(['Name', 'Age', 'Street 1', 'Street 2', 'Zip', 'State', 'Group?',
+        return self.__render_to_csv(['Name', 'Birth Date', 'Street 1', 'Street 2', 'Zip', 'State', 'Group?',
                                      'Date', 'Hours', '# Participants', 'Type', 'Comment'],
                                      data, filename)
 
