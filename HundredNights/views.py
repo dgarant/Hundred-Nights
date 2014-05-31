@@ -85,6 +85,50 @@ def participation_report(request):
         return renderer.create_participation_report_csv(start_date, end_date)
 
 @login_required
+def visitor_respondents(request, question_id, visit_type):
+    question_id = request.GET.get("question_id", None)
+    start_date = request.GET.get("start_date", None)
+    end_date = request.GET.get("end_date", None)
+    visit_type = request.GET.get("visit_type", None)
+    if not question_id or not start_date or not end_date or not visit_type:
+        return HttpResponse(simplejson.dumps(
+                {"result" : "error", 
+                 "message" : "Missing one or more required parameters. " + 
+                    "Expected question_id, start_date, end_date, and visit_type"}), 
+                    content_type="application/json")
+    try:
+        start_date = parser.parse(start_date)
+        end_date = parser.parse(end_date)
+    except ex:
+        return HttpResponse(simplejson.dumps(
+                {"result" : "error", 
+                 "message" : "Failed to parse a supplied date. " + 
+                             "Message was {0}.".format(ex)}),
+                    content_type="application/json")
+    
+    responses = VisitorResponse.objects.select_related("visitor").filter(
+        question__id=question_id, bool_response=True)
+    visitors_in_window = set([v.visitor.id for v in Visit.objects.filter(
+            date__gte = start_date, date__lte = end_date, 
+            visit_type__id = visit_type).only("visitor__id")])
+
+    respondents = []
+    for response in responses:
+        if response.visitor.id in visitors_in_window:
+            respondents.append({"name" : response.visitor.name })
+    return HttpResponse(simplejson.dumps(
+                {
+                    "result" : "success", 
+                    "respondents" : respondents
+                 }), content_type="application/json")
+
+@login_required
+def visit_respondents(request):
+    respondents = []
+    return HttpResponse(simplejson.dumps(respondents),
+                    content_type="application/json")
+
+@login_required
 def visits_by_month(request):
     """ Creates a JSON result set indicating the 
         number of visits over time

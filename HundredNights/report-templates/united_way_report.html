@@ -1,4 +1,5 @@
 {% load tag_extras %}
+{% load staticfiles %}
 
 {% include "report_header.html" %}
 
@@ -6,11 +7,43 @@
         div.spacer {
             margin: 5em;
         }
+        a:hover {cursor:pointer}
     </style>
+
+    <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery-ui-1.10.3.custom.min.js" %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            // An event handler for visitor links used to
+            // expand a particular question and load the sub-table with data
+            function showVisitorData(e) {
+                var hiddenRow = $(this).closest("tr").next("tr");
+                if(! $(hiddenRow).is(":visible")) {
+                    var container = $(hiddenRow).children(".visitor-container");
+                    var questionId = $(this).attr("data-bind");
+
+                    // request the question data
+                    $.getJSON(
+
+                    $(container).html("test");
+                    $(hiddenRow).show(); 
+                    $(this).html("[Hide]");
+                } else {
+                    $(hiddenRow).hide(); 
+                    $(this).html("[Show]");
+                }
+            }
+
+            // when the a 'show' link is clicked on the visitor table, 
+            // load the container
+            $(".show-visitor-data").click(function(e) { e.preventDefault(); showVisitorData(e); });
+        });
+    </script>
 
     <div style="width: 800px; margin: 0 auto;">
     <h1>United Way Report: {{ start_date }} through {{ end_date }}</h1>
-    <h1>{{ visit_type_name }}</h1>
+    <h1>{{ visit_type.type }}</h1>
     <hr/>
 
         <h2>{{ num_unique_visitors }} Unique Visitors</h2>
@@ -24,15 +57,23 @@
                 <tr>
                     <th>Prompt</th>
                     <th>Affirmative Responses</th>
+                    <th><a class="show-all-visitor-data">[Show All]</a></th>
                 </tr>
                 <tr>
             </thead>
             <tbody>
-                {% for prompt, count in visitor_questions %}
+                {% for question, count in visitor_questions %}
                     <tr>
-                        <td>{{ prompt }}</td>
+                        <td>{{ question.prompt }}</td>
                         <td>{{ count }} </td>
+                        <td><a href="{% url visitor-respondents question_id=question.id, start_date=start_date, end_date=end_date, visit_type=visit_type.id %}" 
+                            class="show-visitor-data" 
+                            data-id="{{ question.id }}">[Show]</a></td>
                     </tr>
+                    <tr style="display: none">
+                        <td colspan="3" class="visitor-container">
+                        </td>
+                    <tr>
                 {% endfor %}
             </tbody>
         </table>

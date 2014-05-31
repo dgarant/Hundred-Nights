@@ -11,7 +11,7 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Age</th>
+                <th>Birth Date</th>
                 <th>Group?</th>
                 <th></th>
             </tr>
@@ -20,7 +20,7 @@
             {% for volunteer in volunteers %}
                 <tr>
                     <td>{{ volunteer.name }}</td>
-                    <td>{{ volunteer.age }}</td>
+                    <td>{{ volunteer.date_of_birth }}</td>
                     <td>{{ volunteer.is_group|bool_yn }}</td>
                     <td>
 <a href="{% url edit-volunteer volunteer.id%}">Edit</a> | 

@@ -17,6 +17,10 @@ urlpatterns = patterns('',
     url(r'participation-report/$', participation_report, name='participation-report'),
     url(r'united-way-report/$', united_way_report, name='united-way-report'),
 
+    # ancillary report data functions
+    url(r'visitor-respondents/$', visitor_respondents, name="visitor-respondents"),
+    url(r'visit-respondents/$', visit_respondents, name="visit-respondents"),
+
     # JSON feeds for charting
     url(r'^visits-by-month/$', visits_by_month, name='visits-by-month'),
     url(r'^volunteer-hours-by-month/$', volunteer_hours_by_month, 
