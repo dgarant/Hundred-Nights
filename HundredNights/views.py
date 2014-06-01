@@ -85,7 +85,7 @@ def participation_report(request):
         return renderer.create_participation_report_csv(start_date, end_date)
 
 @login_required
-def visitor_respondents(request, question_id, visit_type):
+def visitor_respondents(request):
     question_id = request.GET.get("question_id", None)
     start_date = request.GET.get("start_date", None)
     end_date = request.GET.get("end_date", None)
@@ -115,7 +115,8 @@ def visitor_respondents(request, question_id, visit_type):
     respondents = []
     for response in responses:
         if response.visitor.id in visitors_in_window:
-            respondents.append({"name" : response.visitor.name })
+            respondents.append({"name" : response.visitor.name, 
+                                "id" : response.visitor.id })
     return HttpResponse(simplejson.dumps(
                 {
                     "result" : "success", 

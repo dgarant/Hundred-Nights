@@ -17,18 +17,26 @@
 
             // An event handler for visitor links used to
             // expand a particular question and load the sub-table with data
-            function showVisitorData(e) {
-                var hiddenRow = $(this).closest("tr").next("tr");
+            function showVisitorData(link) {
+                var hiddenRow = $(link).closest("tr").next("tr");
                 if(! $(hiddenRow).is(":visible")) {
                     var container = $(hiddenRow).children(".visitor-container");
                     var questionId = $(this).attr("data-bind");
 
                     // request the question data
-                    $.getJSON(
-
-                    $(container).html("test");
-                    $(hiddenRow).show(); 
-                    $(this).html("[Hide]");
+                    $.getJSON($(link).attr("href"), function(data) {
+                        var table = $("<table></table>");
+                        $.each(data.respondents, function(i, row) {
+                            table.append("<tr>" + 
+                                "<td width=\"50%\"></td>" + 
+                                "<td width=\"30%\">" + row.name + "</td>" + 
+                                "<td width=\"20%\"><a href=\"/edit-visitor/" + row.id + "\">Edit</a></td>" + 
+                                "</tr>");
+                        });
+                        container.append(table);
+                        $(hiddenRow).show(); 
+                        $(this).html("[Hide]");
+                    });
                 } else {
                     $(hiddenRow).hide(); 
                     $(this).html("[Show]");
@@ -37,7 +45,10 @@
 
             // when the a 'show' link is clicked on the visitor table, 
             // load the container
-            $(".show-visitor-data").click(function(e) { e.preventDefault(); showVisitorData(e); });
+            $(".show-visitor-data").click(function(e) { 
+                    e.preventDefault(); 
+                    showVisitorData(e.target); 
+            });
         });
     </script>
 
@@ -57,7 +68,7 @@
                 <tr>
                     <th>Prompt</th>
                     <th>Affirmative Responses</th>
-                    <th><a class="show-all-visitor-data">[Show All]</a></th>
+                    <th></th>
                 </tr>
                 <tr>
             </thead>
@@ -66,7 +77,7 @@
                     <tr>
                         <td>{{ question.prompt }}</td>
                         <td>{{ count }} </td>
-                        <td><a href="{% url visitor-respondents question_id=question.id, start_date=start_date, end_date=end_date, visit_type=visit_type.id %}" 
+                        <td><a href="/visitor-respondents?question_id={{question.id}}&start_date={{start_date}}&end_date={{end_date}}&visit_type={{visit_type.id}}" 
                             class="show-visitor-data" 
                             data-id="{{ question.id }}">[Show]</a></td>
                     </tr>
