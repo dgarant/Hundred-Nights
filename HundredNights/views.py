@@ -322,10 +322,6 @@ def edit_visitor(request, visitor_id=None):
             new_visitor = form.save()
             qforms.save()
 
-            # on adds, re-render the page so donations can be added
-            if visitor:
-                return redirect("visitors")
-
             # attach new questions
             new_questions = [q for q in VisitorQuestion.objects.all() 
                             if not q in [r.question for r in new_visitor.visitorresponse_set.all()]]
@@ -387,10 +383,6 @@ def edit_volunteer(request, volunteer_id=None):
         form = VolunteerForm(request.POST, request.FILES, instance=volunteer)
         if form.is_valid():
             svol = form.save()
-
-            # on adds, re-render the page so participation can be added
-            if volunteer != None:
-                return redirect("volunteers")
     elif volunteer_id:
         form = VolunteerForm(instance=volunteer)
 
@@ -478,9 +470,6 @@ def edit_donor(request, donor_id=None):
         form = DonorForm(request.POST, request.FILES, instance=donor)
         if form.is_valid():
             form.save()
-            # on adds, re-render the page so donations can be added
-            if donor != None:
-                return redirect("donors")
     elif donor_id:
         form = DonorForm(instance=donor)
 
