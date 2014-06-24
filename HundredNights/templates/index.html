@@ -152,36 +152,6 @@
     </form>
 </fieldset>
 
-<fieldset>
-    <legend>Import</legend>
-
-    <h3>Visitors</h3>
-    <form method="POST" action="/upload-visitors" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div style="display: block;">
-            <select name="visit-type" id="visit-type">
-                <option value="Resource Center">Resource Center</option>
-                <option value="Overnight">Overnight</option>
-            </select>
-        </div>
-        <input type="file" name="visitor-csv"></input>
-        <input type="submit" class="round-button"></input>
-    </form>
-
-    <h3 style="margin-top: 20px;">Donors</h3>
-    <form method="POST" action="/upload-donors" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="donor-csv"></input>
-        <input type="submit" class="round-button"></input>
-    </form>
-
-    <h3 style="margin-top: 20px;">Volunteers</h3>
-    <form method="POST" action="/upload-volunteers" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="volunteer-csv"></input>
-        <input type="submit" class="round-button"></input>
-    </form>
-</fieldset>
 
 {% include "footer.html" %}
 
