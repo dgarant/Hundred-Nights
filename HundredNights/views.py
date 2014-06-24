@@ -146,16 +146,14 @@ def visit_respondents(request):
                     content_type="application/json")
     
     responses = VisitResponse.objects.select_related("visit__visitor").filter(
-        question__id=question_id, bool_response=True)
-    visitors_in_window = set([v.visitor.id for v in Visit.objects.filter(
-            date__gte = start_date, date__lte = end_date, 
-            visit_type__id = visit_type).only("visitor__id")])
+        question__id=question_id, bool_response=True, visit__date__gte = start_date,
+        visit__date__lte = end_date, visit__visit_type__id = visit_type)
 
     respondents = []
     already_recorded = set()
     for response in responses:
         visitor_id = response.visit.visitor.id
-        if visitor_id in visitors_in_window and not visitor_id in already_recorded:
+        if not visitor_id in already_recorded:
             already_recorded.add(visitor_id)
             respondents.append({"name" : response.visit.visitor.name, 
                                 "visitorid" : response.visit.visitor.id,
