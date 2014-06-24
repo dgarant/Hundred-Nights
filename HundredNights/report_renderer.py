@@ -51,7 +51,7 @@ class ReportRenderer(object):
 
             if responses.count() > 0:
                 visit_questions.append(
-                    (question.prompt, responses.count(), len(visitor_ids)))
+                    (question, responses.count(), len(visitor_ids)))
 
         questions = VisitorQuestion.objects.all()
         question_ids = set(questions.values_list('id', flat=True).distinct())

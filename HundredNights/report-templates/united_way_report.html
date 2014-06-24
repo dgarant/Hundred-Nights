@@ -43,11 +43,45 @@
                 }
             }
 
+            // an event handler for visit-question links used to expand a 
+            // particular question and load the sub-table with data
+            function showVisitData(link) {
+                var hiddenRow = $(link).closest("tr").next("tr");
+                if(! $(hiddenRow).is(":visible")) {
+                    var container = $(hiddenRow).children(".visit-container");
+                    var questionId = $(this).attr("data-bind");
+
+                    // request the question data
+                    $.getJSON($(link).attr("href"), function(data) {
+                        var table = $("<table></table>");
+                        $.each(data.respondents, function(i, row) {
+                            table.append("<tr>" + 
+                                "<td width=\"50%\"></td>" + 
+                                "<td width=\"30%\">" + row.name + "</td>" + 
+                                "<td width=\"20%\"><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
+                                "</tr>");
+                        });
+                        container.append(table);
+                        $(hiddenRow).show(); 
+                        $(this).html("[Hide]");
+                    });
+                } else {
+                    $(hiddenRow).hide(); 
+                    $(this).html("[Show]");
+                }
+            }
+
             // when the a 'show' link is clicked on the visitor table, 
             // load the container
             $(".show-visitor-data").click(function(e) { 
                     e.preventDefault(); 
                     showVisitorData(e.target); 
+            });
+
+            // similarly for visit data
+            $(".show-visit-data").click(function(e) {
+                e.preventDefault();
+                showVisitData(e.target);
             });
         });
     </script>
@@ -84,7 +118,7 @@
                     <tr style="display: none">
                         <td colspan="3" class="visitor-container">
                         </td>
-                    <tr>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -98,14 +132,21 @@
                     <th>Prompt</th>
                     <th>Affirmative Responses</th>
                     <th>Unique Respondents</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-        {% for prompt, count, unique_visitors in visit_questions %}
+        {% for question, count, unique_visitors in visit_questions %}
             <tr>
-                <td>{{ prompt }}</td>
+                <td>{{ question.prompt }}</td>
                 <td>{{ count }}</td>
                 <td>{{ unique_visitors }}</td>
+                <td><a href="/visit-respondents?question_id={{question.id}}&start_date={{start_date}}&end_date={{end_date}}&visit_type={{visit_type.id}}"
+                       class="show-visit-data"
+                       data-id="{{question.id}}">[Show]</a></td>
+            </tr>
+            <tr style="display:none">
+                <td colspan="3" class="visit-container"></td>
             </tr>
         {% endfor %}
             </tbody>
