@@ -63,7 +63,7 @@ class Visitor(models.Model):
     """ Represents a guest of the shelter """
 
     name = models.CharField(max_length=75,
-        verbose_name="Visitor Name")
+        verbose_name="Visitor Name", db_index=True)
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     gender = models.CharField(max_length=1, choices = (('M', 'Male'), ('F', 'Female')), 
                             null=True, blank=True)
@@ -197,7 +197,6 @@ class Volunteer(models.Model):
     email = models.CharField(max_length=50, null=True, blank=True,
                 verbose_name="Email")
 
-
     class Meta:
         verbose_name = "Volunteer"
 
@@ -221,3 +220,23 @@ class VolunteerParticipation(models.Model):
 
     def __unicode__(self):
         return u"{0} - {1}".format(volunteer.name, date)
+
+class Referrer(models.Model):
+    """ An individual or organization who refers 
+        individuals to Hundred Nights 
+    """
+    name = models.CharField(max_length=200, null=False, blank=False)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    email = models.CharField(max_length=20, null=True, blank=True)
+
+class Referral(models.Model):
+    """ An instance in which a referrer refers some visitors """
+    referrer = models.ForeignKey(Referrer)
+    date = models.DateField()
+    comment = models.TextField(null=True, blank=True)
+
+class ReferralVisitor(models.Model):
+    """ Relates a referral to a visitor """
+    referral = models.ForeignKey(Referral)
+    visitor = models.ForeignKey(Visitor)
+    visit = models.ForeignKey(Visit, null=True, blank=True)
