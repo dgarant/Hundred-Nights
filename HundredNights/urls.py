@@ -63,6 +63,16 @@ urlpatterns = patterns('',
     url(r'^delete-donation/(?P<donation_id>\d{1,10})$', delete_donation, name='delete-donation'),
     url(r'^add-donation/(?P<donor_id>\d{1,10})$', edit_donation, name='add-donation'),
 
+    # referral-related functions
+    url(r'^referrers/$', referrers, name='referrers'),
+    url(r'^add-referrer/$', edit_referrer, name='add-referrer'),
+    url(r'^edit-referrer/(?P<referrer_id>\d{1,10})$', edit_referrer, name="edit-referrer"),
+    url(r'^delete-referrer', delete_referrer, name="delete-referrer"),
+
+    url(r'^add-referral/(?P<referrer_id>\d{1,10})$', edit_referral, name="add-referral"),
+    url(r'^edit-referral/(?P<referrer_id>\d{1,10})/(?P<referral_id>\d{1,10})$', edit_referral, name='edit-referral'),
+    url(r'^delete-referral/$', delete_referral, name="delete-referral"),
+
     # CSV file uploads
     url(r'^upload-donors.*$', upload_donors, name='upload-donors'),
     url(r'^upload-visitors.*$', upload_visitors, name='upload-visitors'),

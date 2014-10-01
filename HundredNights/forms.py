@@ -41,5 +41,17 @@ class VisitForm(forms.ModelForm):
 VisitQuestionForm = inlineformset_factory(Visit, VisitResponse,
                     extra=0, can_delete=False)
 
+class ReferrerForm(forms.ModelForm):
+    class Meta:
+        model = Referrer
 
+class ReferralForm(forms.ModelForm):
+    class Meta:
+        model = Referral
+        widgets = {
+            'referrer' : forms.HiddenInput() 
+        }
+
+ReferralVisitorForm = inlineformset_factory(
+    Referral, ReferralVisitor, extra=0, can_delete=False)
         

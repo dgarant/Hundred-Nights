@@ -64,6 +64,9 @@
                         <li>
                             <a href="{% url donors %}">Donors</a>
                         </li>
+                        <li>
+                            <a href="{% url referrers %}">Referrals</a>
+                        </li>
                         {% if user.is_authenticated %}
                         <li>
                             <a href="{% url logout %}">Log Out</a>

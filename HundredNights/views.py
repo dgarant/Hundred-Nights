@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from HundredNights.models import *
 from HundredNights.forms import *
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 from datetime import datetime, timedelta
 from dateutil import parser
 from django.db import DatabaseError
@@ -99,7 +100,7 @@ def visitor_respondents(request):
     try:
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
-    except ex:
+    except Exception as ex:
         return HttpResponse(simplejson.dumps(
                 {"result" : "error", 
                  "message" : "Failed to parse a supplied date. " + 
@@ -512,6 +513,14 @@ def edit_donor(request, donor_id=None):
         {"form" : form, "donations" : donations})
 
 @login_required
+@require_POST
+def delete_referral(request):
+    """ Removes a referral from the database """
+    to_delete = Referral.objects.get(id=request.POST.get("id"))
+    to_delete.delete()
+    return redirect("referrers")
+
+@login_required
 def delete_donor(request, donor_id):
     """ Removes a donor from the databse
         Keyword arguments:
@@ -566,6 +575,79 @@ def delete_donation(request, donation_id):
     to_delete.delete()
     return redirect("edit-donor", donor_id=donor_id)
 
+@login_required
+def referrers(request):
+    """ Presents a list of referrers """
+    referrers = Referrer.objects.all()
+    return render(request, "referrer-list.html", {"referrers" : referrers})
+
+@login_required
+def edit_referrer(request, referrer_id=None):
+    """ Presents a page to edit a referrer
+        Keyword arguments:
+            referrer_id -- The primary key of the referrer, 
+                           or None to perform an add
+        Returns an edit template for the referrer
+    """
+    referrer = None
+    try:
+        referrer = Referrer.objects.get(id=referrer_id)
+        referrals= referrer.referral_set.all()
+    except Referrer.DoesNotExist:
+        print("Referrer with id {0} does not exist".format(referrer_id))
+        form = ReferrerForm()
+        referrals = []
+
+    if request.method == "POST": 
+        form = ReferrerForm(request.POST, request.FILES, instance=referrer)
+        if form.is_valid():
+            form.save()
+    elif referrer_id:
+        form = ReferrerForm(instance=referrer)
+
+    return render(request, 'edit-referrer.html', 
+        {"form" : form, "referrals" : referrals})
+
+@login_required
+def edit_referral(request, referrer_id, referral_id=None):
+    """ Presents a page to edit a referral  
+        Keyword arguments:
+            referrer_id -- The primary key of the referrer 
+                    to add or edit a referral for
+            referral_id -- The primary key of the referral to 
+                    edit, or None to perform an add
+        Returns an edit template for a donation on GET, 
+            or on POST a redirection to the donor list
+    """
+    referrer = Referrer.objects.get(id=referrer_id)
+    referral = None
+    try:
+        referral = Referral.objects.get(id=referral_id)
+    except Referral.DoesNotExist:
+        form = ReferralForm(initial={'referrer' : referrer.pk})
+
+    if request.method == "POST":
+        form = ReferralForm(request.POST, request.FILES, instance=referral)
+        if form.is_valid():
+            form.save()
+            return redirect("edit-referrer", referrer_id=referrer_id)
+    elif referral_id:
+        form = ReferralForm(instance=referral, 
+                    initial={'referrer' : referrer.pk})
+
+    return render(request, 'edit-referral.html',
+        {"form" : form, "referrer" : referrer})
+
+@login_required
+@require_POST
+def delete_referrer(request):
+    """ Removes a referrer from the databse.
+        Returns a redirection to a list of referrers
+    """
+    to_delete = Referrer.objects.get(id=request.POST.get("id"))
+    to_delete.delete()
+    return redirect("referrers")
+    
 @login_required
 @csrf_protect
 def upload_donors(request):

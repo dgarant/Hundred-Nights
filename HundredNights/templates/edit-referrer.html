@@ -1,0 +1,91 @@
+
+{% load tabindex from tag_extras %}
+{% load currency from tag_extras %}
+{% load bool_yn from tag_extras %}
+{% include "topmatter.html" %}
+
+<form method="post" action="" id="referrer-form">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="right">
+        <div style="display: block;">
+            <a href="{% url referrers %}" style="margin-top: 15px" class="round-button" tabindex="30">Back to List</a>
+            <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Referrer" tabindex="40"/>
+        </div>
+    </div>
+    <div class="left">
+
+        <label for="id_name">Name</label>
+        {{ form.name.errors }}
+        {{ form.name|tabindex:1 }}
+
+        <label for="id_phone">Phone:</label>
+        {{ form.phone.errors }}
+        {{ form.phone|tabindex:10 }}
+
+        <label for="id_email">Email:</label>
+        {{ form.email.errors }}
+        {{ form.email|tabindex:20 }}
+    </div>
+</form>
+
+{% if form.instance.id %}
+<fieldset style="clear: both;"> 
+    <legend>Referrals</legend>
+
+    <a href="{% url add-referral form.instance.id %}" id="add-referral-button" class="round-button">Add Referral</a>
+
+    <table class="referral-table">
+        <thead>
+            <th>Date</th>
+            <th>Comment</th>
+            <th></th>
+        </thead>
+        <tbody>
+       {% for referral in referrals %}
+            <tr>
+                <td>{{ referral.date }}</td>
+                <td>{{ referral.comment }}</td>
+                <td>
+                    <a href="{% url edit-referral form.instance.id referral.id %}">Edit</a> | 
+                    <form action="{% url delete-referral %}" method="POST" style="display: inline;">
+                        <input type="hidden" value="{{referral.id}}" name="referral_id" />
+                        <a href="#" >Delete</a>
+                    </form>
+                </td>
+            </tr>
+       {% endfor %}
+   </tbody>
+</table>
+</fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var referral_table = $(".referral-table").dataTable({
+            "bLengthChange" : false,
+            "iDisplayLength": 1000,
+            "sDom": 'T<"clear">lfrtip',
+            "bFilter" : false,
+            "bPaginate" : false,
+            "bInfo" : false,
+            "oTableTools": {
+                "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                "aButtons" : [ ]
+            }
+        });
+
+       $("#add-referral-button").click(function(e) {
+            $.ajax({
+                url: "{% url add-referral form.instance.id %}", 
+                data: $("#referral-form").serialize(),
+                type: "POST",
+                async: false
+            });
+       });
+    });
+</script>
+{% endif %}
+
+{% include "footer.html" %}
+
+
