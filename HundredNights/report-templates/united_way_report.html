@@ -111,7 +111,7 @@
                     <tr>
                         <td>{{ question.prompt }}</td>
                         <td>{{ count }} </td>
-                        <td><a href="/visitor-respondents?question_id={{question.id}}&start_date={{start_date}}&end_date={{end_date}}&visit_type={{visit_type.id}}" 
+                        <td><a href="/visitor-respondents?question_id={{question.id}}&start_date={{start_date|date:"c"}}&end_date={{end_date|date:"c"}}&visit_type={{visit_type.id}}" 
                             class="show-visitor-data" 
                             data-id="{{ question.id }}">[Show]</a></td>
                     </tr>
@@ -141,7 +141,7 @@
                 <td>{{ question.prompt }}</td>
                 <td>{{ count }}</td>
                 <td>{{ unique_visitors }}</td>
-                <td><a href="/visit-respondents?question_id={{question.id}}&start_date={{start_date}}&end_date={{end_date}}&visit_type={{visit_type.id}}"
+                <td><a href="/visit-respondents?question_id={{question.id}}&start_date={{start_date|date:"c"}}&end_date={{end_date|date:"c"}}&visit_type={{visit_type.id}}"
                        class="show-visit-data"
                        data-id="{{question.id}}">[Show]</a></td>
             </tr>
