@@ -24,17 +24,26 @@ def index(request):
     return render(request, 'index.html', {"visit_types" : VisitType.objects.all()})
 
 @login_required
+@csrf_protect
+@require_POST
 def united_way_report(request):
     """ Creates a report representing responses to 
         per-visit and one-time questions over a time window
     """
     renderer = ReportRenderer()
-    start_date = parser.parse(request.GET.get('start-date', 
-        datetime.now() - timedelta(days=30)))
-    end_date = parser.parse(request.GET.get('end-date', datetime.now()))
-    visit_type = VisitType.objects.get(id=request.GET.get("visit-type"))
+    if "start-date" in request.POST:
+        start_date = parser.parse(request.POST.get('start-date'))
+    else:
+        start_date = datetime.now() - timedelta(days=30)
+
+    if "end-date" in request.POST:
+        end_date = parser.parse(request.POST.get('end-date'))
+    else:
+        end_date = datetime.now()
+
+    visit_types = VisitType.objects.filter(id__in=request.POST.getlist("visit-type"))
     return renderer.create_united_way_report_html(
-                start_date, end_date, visit_type)
+                request, start_date, end_date, visit_types)
 
 @login_required
 def visit_report(request):
@@ -46,7 +55,7 @@ def visit_report(request):
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
     if output_format == 'html':
-        return renderer.create_visit_report_html(start_date, end_date)
+        return renderer.create_visit_report_html(request, start_date, end_date)
     else:
         return renderer.create_visit_report_csv(start_date, end_date)
 
@@ -63,12 +72,12 @@ def donation_report(request):
 
     if report_type == "full":
         if output_format == 'html':
-            return renderer.create_donation_report_html(start_date, end_date)
+            return renderer.create_donation_report_html(request, start_date, end_date)
         else:
             return renderer.create_donation_report_csv(start_date, end_date)
     else: # mailing labels
         if output_format == "html":
-            return renderer.create_mailing_label_report_html()
+            return renderer.create_mailing_label_report_html(request)
         else:
             return renderer.create_mailing_label_report_csv()
 
@@ -81,17 +90,19 @@ def participation_report(request):
         datetime.now() - timedelta(days=30)))
     end_date = parser.parse(request.GET.get('end-date', datetime.now()))
     if output_format == 'html':
-        return renderer.create_participation_report_html(start_date, end_date)
+        return renderer.create_participation_report_html(request, start_date, end_date)
     else:
         return renderer.create_participation_report_csv(start_date, end_date)
 
+
 @login_required
+@csrf_protect
 def visitor_respondents(request):
-    question_id = request.GET.get("question_id", None)
-    start_date = request.GET.get("start_date", None)
-    end_date = request.GET.get("end_date", None)
-    visit_type = request.GET.get("visit_type", None)
-    if not question_id or not start_date or not end_date or not visit_type:
+    question_id = request.POST.get("question_id", None)
+    start_date = request.POST.get("start_date", None)
+    end_date = request.POST.get("end_date", None)
+    visit_type_ids = request.POST.getlist("visit_types", None)
+    if not question_id or not start_date or not end_date or not visit_type_ids:
         return HttpResponse(simplejson.dumps(
                 {"result" : "error", 
                  "message" : "Missing one or more required parameters. " + 
@@ -111,7 +122,7 @@ def visitor_respondents(request):
         question__id=question_id, bool_response=True)
     visitors_in_window = set([v.visitor.id for v in Visit.objects.filter(
             date__gte = start_date, date__lte = end_date, 
-            visit_type__id = visit_type).only("visitor__id")])
+            visit_type__id__in = visit_type_ids).only("visitor__id")])
 
     respondents = []
     for response in responses:
@@ -125,12 +136,17 @@ def visitor_respondents(request):
                  }), content_type="application/json")
 
 @login_required
+@csrf_protect
 def visit_respondents(request):
-    question_id = request.GET.get("question_id", None)
-    start_date = request.GET.get("start_date", None)
-    end_date = request.GET.get("end_date", None)
-    visit_type = request.GET.get("visit_type", None)
-    if not question_id or not start_date or not end_date or not visit_type:
+    question_id = request.POST.get("question_id", None)
+    start_date = request.POST.get("start_date", None)
+    end_date = request.POST.get("end_date", None)
+    visit_types = request.POST.getlist("visit_types", None)
+    print(visit_types)
+    print(question_id)
+    print(start_date)
+    print(end_date)
+    if not question_id or not start_date or not end_date or not visit_types:
         return HttpResponse(simplejson.dumps(
                 {"result" : "error", 
                  "message" : "Missing one or more required parameters. " + 
@@ -148,7 +164,7 @@ def visit_respondents(request):
     
     responses = VisitResponse.objects.select_related("visit__visitor").filter(
         question__id=question_id, bool_response=True, visit__date__gte = start_date,
-        visit__date__lte = end_date, visit__visit_type__id = visit_type)
+        visit__date__lte = end_date, visit__visit_type__id__in = visit_types)
 
     respondents = []
     already_recorded = set()

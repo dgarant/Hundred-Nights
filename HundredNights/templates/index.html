@@ -131,14 +131,19 @@
 
 <fieldset>
     <legend>United Way Report</legend>
-    <form action="{% url united-way-report %}" target="_blank" method="get">
+    <form action="{% url united-way-report %}" target="_blank" method="post">
         
+        {% csrf_token %}
        <div style="display: inline-block;">
-            <select name="visit-type" id="visit-type">
+            
+            <ul class="multicol-checkbox">
                 {% for vtype in visit_types %}
-                    <option value="{{vtype.id}}">{{vtype.type}}</option>
+                    <li>
+                        <input type="checkbox" name="visit-type" value="{{vtype.id}}"/>
+                        <label>{{vtype.type}}</label>
+                    </li>
                 {% endfor %}
-            </select>
+            </ul>
         </div>
         <div style="display: inline-block;">
             <span style="margin: 5px; font-weight: bold;">Start date</span>

@@ -3,6 +3,27 @@
 	padding: 0;
 }
 
+.multicol-checkbox div { 
+    display: inline-block;
+}
+.multicol-checkbox li { 
+    border: 1px transparent solid; 
+    display:inline-block;
+    width:12em;
+} 
+
+.multicol-checkbox label { 
+    margin: 0px;
+    display: inline-block;
+}
+
+.multicol-checkbox  { 
+  margin: 0; 
+  padding: 0; 
+  margin-left: 10px; 
+  list-style: none; 
+} 
+
 .dataTables_wrapper {
     clear: none !important;
 }
@@ -156,7 +177,7 @@ a.round-button {
 	padding-top: 20px;
 }
 
-#left-sidebar p, li{
+#left-sidebar p, #left-sidebar li{
     font: 1.2em/1.8em Tahoma, sans-serif;
     margin-bottom: 10px;
 }

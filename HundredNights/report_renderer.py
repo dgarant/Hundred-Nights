@@ -8,8 +8,9 @@ import csv
 import datetime
 from django.conf import settings
 from django.http import HttpResponse
-from django.template import Context
+from django.template import Context, RequestContext
 from django.template.loader import get_template
+from django.shortcuts import render_to_response
 from HundredNights.models import *
 from itertools import chain
 from collections import defaultdict
@@ -19,10 +20,9 @@ class ReportRenderer(object):
     def __init__(self):
         pass
 
-    def __render_to_html(self, template_path, data_dict):
-        template = get_template(template_path)
-        html  = template.render(Context(data_dict))
-        return HttpResponse(html)
+    def __render_to_html(self, template_path, request, data_dict):
+        return render_to_response(template_path, data_dict, 
+                        context_instance=RequestContext(request))
 
     def __render_to_csv(self, field_names, data, filename):
         response = HttpResponse(content_type='text/csv')
@@ -35,15 +35,16 @@ class ReportRenderer(object):
         
         return response
 
-    def create_united_way_report_html(self, start_date, end_date, visit_type):
+    def create_united_way_report_html(self, request, start_date, end_date, visit_types):
         """ Builds a page from an HTML template """
+        visit_type_ids = [v.id for v in visit_types]
         visit_questions = [] # contianing tuples (prompt, count, distinct users)
         for question in VisitQuestion.objects.all():
             responses = question.visitresponse_set. \
                 select_related("visit").filter(
-                visit__date__gt=start_date,
-                visit__date__lt=end_date,
-                visit__visit_type_id=visit_type.id,
+                visit__date__gte=start_date,
+                visit__date__lte=end_date,
+                visit__visit_type_id__in=visit_type_ids,
                 bool_response=True).all()
             visitor_ids = set()
             for resp in responses:
@@ -63,16 +64,20 @@ class ReportRenderer(object):
 
         overall_total_visits = 0
         num_unique_visitors = 0
+        num_veteran_visits = 0
+        num_visiting_veterans = 0
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
             num_visits = visitor.visit_set.filter(
                  date__gte = start_date, 
                  date__lte = end_date,
-                 visit_type__id = visit_type.id).count()
+                 visit_type__id__in = visit_type_ids).count()
             if num_visits == 0:
                  continue
             num_unique_visitors += 1
             overall_total_visits += num_visits
+            num_visiting_veterans += 1 if visitor.veteran else 0
+            num_veteran_visits += num_visits if visitor.veteran else 0
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
@@ -85,7 +90,7 @@ class ReportRenderer(object):
                             bool_response=True).all():
                 visitor_questions[response.question] += 1
             
-        return self.__render_to_html("united_way_report.html", 
+        return self.__render_to_html("united_way_report.html", request,
                 {"num_unique_visitors" : num_unique_visitors,
                 "total_visits" : overall_total_visits,
                  "visit_questions" : sorted(visit_questions), 
@@ -94,7 +99,10 @@ class ReportRenderer(object):
                  "visitor_questions" : sorted(visitor_questions.iteritems()),
                  "visitors_by_id_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_id_town.iteritems()]),
                  "visitors_by_resid_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_resid_town.iteritems()]),
-                 "visit_type" : visit_type})
+                 "report_header" : ", ".join([v.type for v in visit_types]),
+                 "num_veteran_visits" : num_veteran_visits,
+                 "num_visiting_veterans" : num_visiting_veterans,
+                 "visit_types" : visit_types})
 
     def create_visit_report_csv(self, start_date, end_date):
         data_dict = self.__create_visit_report_data(start_date, end_date)
@@ -107,7 +115,7 @@ class ReportRenderer(object):
                                      'Town of ID', 'Veteran?', 'Visit Type', 
                                      'Date', 'Comment'], data, filename)
 
-    def create_visit_report_html(self, start_date, end_date):
+    def create_visit_report_html(self, request, start_date, end_date):
         data = self.__create_visit_report_data(start_date, end_date)
 
         # more terse format for HTML - create a table of counts on a per-visitor basis
@@ -120,7 +128,7 @@ class ReportRenderer(object):
             visitors[visit.visitor][2] += 1
 
         print(visitors.items())
-        return self.__render_to_html('visitor_report.html', {"visit_dict" : dict(visitors), 
+        return self.__render_to_html('visitor_report.html', request, {"visit_dict" : dict(visitors), 
                     "start_date" : data["start_date"], "end_date" : data["end_date"]})
 
     def __create_visit_report_data(self, start_date, end_date):
@@ -159,10 +167,10 @@ class ReportRenderer(object):
                                      'State', 'Is Org?', 'Email', 'Org. Contact', 'Title'], 
                                      data, filename)
 
-    def create_mailing_label_report_html(self):
+    def create_mailing_label_report_html(self, request):
         """ Returns an HTML formatted report with all donors' contact info"""
         data = self.__create_mailing_label_report_data()
-        return self.__render_to_html('mailing_labels.html', 
+        return self.__render_to_html('mailing_labels.html', request,
             {"donors" : data, "created_date" : datetime.now().strftime("%Y-%m-%d")})
         
 
@@ -183,9 +191,9 @@ class ReportRenderer(object):
                                      'Title', 'Amount', 'Monetary', 
                                      'Description', 'Date', 'Comment'], data, filename)
 
-    def create_donation_report_html(self, start_date, end_date):
+    def create_donation_report_html(self, request, start_date, end_date):
         data = self.__create_donation_report_data(start_date, end_date)
-        return self.__render_to_html('donation_report.html', data)
+        return self.__render_to_html('donation_report.html', request, data)
 
     def __create_donation_report_data(self, start_date, end_date):
         donations = Donation.objects.filter(
@@ -211,9 +219,9 @@ class ReportRenderer(object):
                                      'Date', 'Hours', '# Participants', 'Type', 'Comment'],
                                      data, filename)
 
-    def create_participation_report_html(self, start_date, end_date):
+    def create_participation_report_html(self, request, start_date, end_date):
         data = self.__create_participation_report_data(start_date, end_date)
-        return self.__render_to_html('participation_report.html', data)
+        return self.__render_to_html('participation_report.html', request, data)
 
     def __create_participation_report_data(self, start_date, end_date):
         part_by_type = [( 

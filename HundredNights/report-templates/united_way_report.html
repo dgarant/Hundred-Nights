@@ -24,22 +24,34 @@
                     var questionId = $(this).attr("data-bind");
 
                     // request the question data
-                    $.getJSON($(link).attr("href"), function(data) {
-                        var table = $("<table></table>");
-                        $.each(data.respondents, function(i, row) {
-                            table.append("<tr>" + 
-                                "<td width=\"50%\"></td>" + 
-                                "<td width=\"30%\">" + row.name + "</td>" + 
-                                "<td width=\"20%\"><a href=\"/edit-visitor/" + row.id + "\">Edit</a></td>" + 
-                                "</tr>");
-                        });
-                        container.append(table);
-                        $(hiddenRow).show(); 
-                        $(this).html("[Hide]");
+                    var relatedForm = $(link).closest("form");
+                    $.ajax({
+                        dataType : "json",
+                        url: relatedForm.attr("action"), 
+                        type: "post",
+                        data : relatedForm.serialize(),
+                        success : function(data) {
+                            if(data["result"] == "error") {
+                                alert(data["message"]);
+                            } else {
+                                var table = $("<table></table>");
+                                $.each(data.respondents, function(i, row) {
+                                    table.append("<tr>" + 
+                                        "<td width=\"50%\"></td>" + 
+                                        "<td width=\"30%\">" + row.name + "</td>" + 
+                                        "<td width=\"20%\"><a href=\"/edit-visitor/" + row.id + "\">Edit</a></td>" + 
+                                        "</tr>");
+                                });
+                                container.empty();
+                                container.append(table);
+                                $(hiddenRow).show(); 
+                                $(link).html("[Hide]");
+                            }
+                        }
                     });
                 } else {
                     $(hiddenRow).hide(); 
-                    $(this).html("[Show]");
+                    $(link).html("[Hide]");
                 }
             }
 
@@ -52,18 +64,30 @@
                     var questionId = $(this).attr("data-bind");
 
                     // request the question data
-                    $.getJSON($(link).attr("href"), function(data) {
-                        var table = $("<table></table>");
-                        $.each(data.respondents, function(i, row) {
-                            table.append("<tr>" + 
-                                "<td width=\"50%\"></td>" + 
-                                "<td width=\"30%\">" + row.name + "</td>" + 
-                                "<td width=\"20%\"><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
-                                "</tr>");
-                        });
-                        container.append(table);
-                        $(hiddenRow).show(); 
-                        $(this).html("[Hide]");
+                    var relatedForm = $(link).closest("form");
+                    $.ajax({
+                        dataType : "json",
+                        url : relatedForm.attr("action"),
+                        type : "post",
+                        data : relatedForm.serialize(),
+                        success : function(data) {
+                            if(data["result"] == "error") {
+                                alert(data["message"]);
+                            } else {
+                                var table = $("<table></table>");
+                                $.each(data.respondents, function(i, row) {
+                                    table.append("<tr>" + 
+                                        "<td width=\"50%\"></td>" + 
+                                        "<td width=\"30%\">" + row.name + "</td>" + 
+                                        "<td width=\"20%\"><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
+                                        "</tr>");
+                                });
+                                container.empty();
+                                container.append(table);
+                                $(hiddenRow).show(); 
+                                $(this).html("[Hide]");
+                            }
+                        }
                     });
                 } else {
                     $(hiddenRow).hide(); 
@@ -86,15 +110,29 @@
         });
     </script>
 
-    <div style="width: 800px; margin: 0 auto;">
+    <div style="padding-left: 50px; margin-left: 50px;">
     <h1>United Way Report: {{ start_date }} through {{ end_date }}</h1>
-    <h1>{{ visit_type.type }}</h1>
+    <h1>
+        {{ report_header }}
+    </h1>
     <hr/>
 
         <h2>{{ num_unique_visitors }} Unique Visitors</h2>
         <h2>{{ total_visits }} Visits Overall</h2>
+        <h2>{{ num_veteran_visits }} Veteran Visits ({{ num_visiting_veterans }} unique)</h2>
+        <!-- 
+        <div class="col-md-3">
+        col 1
+        </div>
+        <div class="col-md-3">
+        col 2
+        </div>
+        <div class="col-md-3">
+        col 3
+        </div>
+        -->
 
-        <div class="spacer"></div>
+        <div class="row" style="clear: both"></div>
 
         <h2>One-time Responses</h2>
         <table>
@@ -111,9 +149,18 @@
                     <tr>
                         <td>{{ question.prompt }}</td>
                         <td>{{ count }} </td>
-                        <td><a href="/visitor-respondents?question_id={{question.id}}&start_date={{start_date|date:"c"}}&end_date={{end_date|date:"c"}}&visit_type={{visit_type.id}}" 
-                            class="show-visitor-data" 
-                            data-id="{{ question.id }}">[Show]</a></td>
+                        <td>
+                        <form action="/visitor-respondents/" method="post" class="show-visitor-data-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="question_id" value="{{question.id}}" />
+                            <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                            <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                            {% for visit_type in visit_types %}
+                                <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                            {% endfor %}
+                            <a class="show-visitor-data">[Show]</a>
+                        </form>
+                        </td>
                     </tr>
                     <tr style="display: none">
                         <td colspan="3" class="visitor-container">
@@ -141,9 +188,18 @@
                 <td>{{ question.prompt }}</td>
                 <td>{{ count }}</td>
                 <td>{{ unique_visitors }}</td>
-                <td><a href="/visit-respondents?question_id={{question.id}}&start_date={{start_date|date:"c"}}&end_date={{end_date|date:"c"}}&visit_type={{visit_type.id}}"
-                       class="show-visit-data"
-                       data-id="{{question.id}}">[Show]</a></td>
+                <td>
+                    <form action="/visit-respondents/" method="post" class="show-visitor-data-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="question_id" value="{{question.id}}" />
+                        <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                        <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                        {% for visit_type in visit_types %}
+                            <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                        {% endfor %}
+                        <a class="show-visit-data">[Show]</a>
+                    </form>
+                </td>
             </tr>
             <tr style="display:none">
                 <td colspan="3" class="visit-container"></td>
