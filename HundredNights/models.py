@@ -61,6 +61,22 @@ class Donation(models.Model):
     
 class Visitor(models.Model):
     """ Represents a guest of the shelter """
+    INCOME_LEVEL_1 = "IncomeLevel1"
+    INCOME_LEVEL_2 = "IncomeLevel2"
+    INCOME_LEVEL_3 = "IncomeLevel3"
+    INCOME_LEVEL_4 = "IncomeLevel4"
+    INCOME_LEVEL_5 = "IncomeLevel5"
+    INCOME_LEVEL_6 = "IncomeLevel6"
+    INCOME_LEVEL_7 = "IncomeLevel7"
+    ETHNICITY_ASIAN = "Asian"
+    ETHNICITY_BLACK = "Blank"
+    ETHNICITY_HISP = "Hisp"
+    ETHNICITY_MULTI = "Multi"
+    ETHNICITY_NATIVE = "Native"
+    ETHNICITY_PACIF = "Pacif"
+    ETHNICITY_WHITE = "White"
+    ETHNICITY_OTHER = "Others"
+    ETHNICITY_UNK = "Unknown"
 
     name = models.CharField(max_length=75,
         verbose_name="Visitor Name", db_index=True)
@@ -73,6 +89,30 @@ class Visitor(models.Model):
         verbose_name="Town of ID", null=True, blank=True)
     veteran = models.BooleanField(
         verbose_name="Is this visitor a veteran?")
+    income = models.CharField(max_length=50, null=True, blank=True, 
+        choices=(
+                    (INCOME_LEVEL_1, "$0-$9,9999"),
+                    (INCOME_LEVEL_2, "$10,000-$14,999"),
+                    (INCOME_LEVEL_3, "$15,000-$24,999"),
+                    (INCOME_LEVEL_4, "$25,000-$34,999"),
+                    (INCOME_LEVEL_5, "$35,000-$49,999"),
+                    (INCOME_LEVEL_6, "$50,000-$74,999"),
+                    (INCOME_LEVEL_7, "$75,000 and above")
+                )
+        )
+    ethnicity = models.CharField(max_length=50, null=True, blank=True,
+        choices=(
+                    (ETHNICITY_ASIAN, "Asian"),
+                    (ETHNICITY_BLACK, "Black/African American"),
+                    (ETHNICITY_HISP, "Hispanic/Latino"),
+                    (ETHNICITY_MULTI, "Multi-Racial"),
+                    (ETHNICITY_NATIVE, "Native American"),
+                    (ETHNICITY_PACIF, "Pacific Islander"),
+                    (ETHNICITY_WHITE, "White/Caucasian"),
+                    (ETHNICITY_OTHER, "Others"),
+                    (ETHNICITY_UNK, "Unknown"),
+                )
+        )
 
     class Meta:
         verbose_name = "Visitor"

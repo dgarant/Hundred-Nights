@@ -16,10 +16,13 @@
 
     <div class="right">
 
-        {{ form.veteran.errors }}
-        {{ form.veteran|tabindex:5 }}
-        <label for="id_veteran" style="display: inline;">
-        Veteran?</label>
+        <label for="id_income">Income:</label>
+        {{ form.income.errors }}
+        {{ form.income|tabindex:7 }}
+
+        <label for="id_ethnicity">Ethnicity:</label>
+        {{ form.ethnicity.errors }}
+        {{ form.ethnicity|tabindex:8 }}
 
         {% if form.instance.id %}
         <div style="display: block">
@@ -54,6 +57,12 @@
         <label for="id_gender">Gender:</label>
         {{ form.gender.errors }}
         {{ form.gender|tabindex:5 }}
+
+        <div style="margin-top:10px"></div>
+        {{ form.veteran.errors }}
+        {{ form.veteran|tabindex:6 }}
+        <label for="id_veteran" style="display: inline;">
+        Veteran?</label>
 
     </div>
 
