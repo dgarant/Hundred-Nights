@@ -14,6 +14,7 @@ from django.shortcuts import render_to_response
 from HundredNights.models import *
 from itertools import chain
 from collections import defaultdict
+import collections
 
 class ReportRenderer(object):
 
@@ -66,6 +67,22 @@ class ReportRenderer(object):
         num_unique_visitors = 0
         num_veteran_visits = 0
         num_visiting_veterans = 0
+
+        ethnicity_choices = Visitor._meta.get_field_by_name("ethnicity")[0].choices
+        ethnicity_info = self.__initialize_dict([c[1] for c in ethnicity_choices]) 
+        ethnicity_info["Unknown"] = 0
+        ethnicity_map = dict(ethnicity_choices)
+        ethnicity_map[None] = "Unknown"
+
+        income_choices = Visitor._meta.get_field_by_name("income")[0].choices
+        income_info = self.__initialize_dict([c[1] for c in income_choices]) 
+        income_info["Unknown"] = 0
+        income_map = dict(income_choices)
+        income_map[None] = "Unknown"
+
+        num_male = 0 
+        age_info = dict()
+
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
             num_visits = visitor.visit_set.filter(
@@ -79,10 +96,14 @@ class ReportRenderer(object):
             num_visiting_veterans += 1 if visitor.veteran else 0
             num_veteran_visits += num_visits if visitor.veteran else 0
 
-            unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper()]
+            ethnicity_info[ethnicity_map[visitor.ethnicity]] += 1
+            income_info[income_map[visitor.income]] += 1
+            num_male += int(visitor.gender == "M")
+
+            unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
 
-            unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper()]
+            unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper().strip()]
             visitors_by_resid_town[visitor.town_of_residence.upper()] = [unique_visits+1, total_visits+num_visits]
 
             for response in visitor.visitorresponse_set.filter(
@@ -102,7 +123,19 @@ class ReportRenderer(object):
                  "report_header" : ", ".join([v.type for v in visit_types]),
                  "num_veteran_visits" : num_veteran_visits,
                  "num_visiting_veterans" : num_visiting_veterans,
-                 "visit_types" : visit_types})
+                 "visit_types" : visit_types,
+                 "ethnicity_distr" : ethnicity_info,
+                 "income_distr" : income_info,
+                 "age_distr" : age_info,
+                 "num_male" : num_male,
+                 "num_female" : num_unique_visitors - num_male
+                 })
+
+    def __initialize_dict(self, allowable_entries):
+        d = collections.OrderedDict()
+        for entry in allowable_entries:
+            d[entry] = 0
+        return d
 
     def create_visit_report_csv(self, start_date, end_date):
         data_dict = self.__create_visit_report_data(start_date, end_date)

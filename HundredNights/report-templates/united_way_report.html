@@ -117,23 +117,58 @@
     </h1>
     <hr/>
 
-        <h2>{{ num_unique_visitors }} Unique Visitors</h2>
-        <h2>{{ total_visits }} Visits Overall</h2>
-        <h2>{{ num_veteran_visits }} Veteran Visits ({{ num_visiting_veterans }} unique)</h2>
-        <!-- 
-        <div class="col-md-3">
-        col 1
+        <div class="row">
+            <div class="col-md-6">
+                <h3>{{ num_unique_visitors }} Unique Visitors</h3>
+                <h3>{{ total_visits }} Visits Overall</h3>
+                <h3>{{ num_veteran_visits }} Veteran Visits ({{ num_visiting_veterans }} unique)</h3>
+            </div>
+            <div class="col-md-6">
+                <h3>{{ num_male }} Male, {{ num_female }} Female</h3>
+            </div>
         </div>
-        <div class="col-md-3">
-        col 2
+        <div class="row">
+            <div class="col-md-6">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ethnicity</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% for ethnicity, count in ethnicity_distr.items %} 
+                    <tr>
+                        <td>{{ ethnicity }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Income</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% for income, count in income_distr.items %} 
+                    <tr>
+                        <td>{{ income }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="col-md-3">
-        col 3
-        </div>
-        -->
+
 
         <div class="row" style="clear: both"></div>
-
+        <div class="col-md-6">
         <h2>One-time Responses</h2>
         <table>
             <thead>
@@ -169,9 +204,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
 
-        <div class="spacer"></div>
-
+        <div class="col-md-6">
         <h2>Per-Visit Responses</h2>
         <table>
             <thead>
@@ -207,9 +242,11 @@
         {% endfor %}
             </tbody>
         </table>
+        </div>
 
         <div class="spacer"></div>
 
+        <div class="col-md-6">
         <h2>Visits by Town of ID</h2>
         <table>
             <thead>
@@ -230,9 +267,9 @@
             </tbody>
         </table>
         Number of unique towns of ID: {{ visitors_by_id_town|length }}
+        </div>
 
-        <div class="spacer"></div>
-
+        <div class="col-md-6">
         <h2>Visits by Town of Residence</h2>
         <table>
             <thead>
@@ -253,6 +290,7 @@
             </tbody>
         </table>
         Number of unique towns of residence: {{ visitors_by_resid_town|length }}
+        </div>
         </div>
 
     </body>
