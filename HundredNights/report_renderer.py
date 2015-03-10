@@ -114,7 +114,9 @@ class ReportRenderer(object):
             num_male += int(visitor.gender == "M")
 
             if visitor.date_of_birth:
-                age_info[age_map[self.calculate_age(visitor.date_of_birth)]] += 1
+                curr_age = self.calculate_age(visitor.date_of_birth)
+                if curr_age in age_map:
+                    age_info[age_map[curr_age]] += 1
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
@@ -180,7 +182,6 @@ class ReportRenderer(object):
         for visit in data["other_visits"]:
             visitors[visit.visitor][2] += 1
 
-        print(visitors.items())
         return self.__render_to_html('visitor_report.html', request, {"visit_dict" : dict(visitors), 
                     "start_date" : data["start_date"], "end_date" : data["end_date"]})
 
