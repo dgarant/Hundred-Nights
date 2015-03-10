@@ -355,7 +355,7 @@ def edit_visitor(request, visitor_id=None):
     visitor = None
     try:
         visitor = Visitor.objects.select_related().get(id=visitor_id)
-        visits = visitor.visit_set.all()
+        visits = visitor.visit_set.select_related("visitquestion_set").all()
 
         # attach new questions
         new_questions = [q for q in VisitorQuestion.objects.all() 

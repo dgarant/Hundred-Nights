@@ -3,6 +3,7 @@
 {% load toticks from tag_extras %}
 {% load bool_yn from tag_extras %}
 {% load after_split_point from tag_extras %}
+{% load visit_response_notes from tag_extras %}
 {% include "topmatter.html" %}
 
 {% if form.instance.id %}
@@ -107,6 +108,7 @@
             <th>Ticks</th>
             <th>Date</th>
             <th>Visit Type</th>
+            <th>Notes</th>
             <th></th>
         </thead>
         <tbody>
@@ -115,6 +117,7 @@
                 <td>{{ visit.date|toticks }}</td>
                 <td>{{ visit.date }}</td>
                 <td>{{ visit.visit_type }}</td>
+                <td>{{ visit.comment }} {{ visit.visitresponse_set|visit_response_notes|linebreaksbr }}</td>
                 <td>
                     <a href="{% url edit-visit form.instance.id visit.id %}">Edit</a> | 
                     <a href="{% url delete-visit visit.id %}"
@@ -144,6 +147,7 @@
                                  "bVisible":    false },
                 /* Display date */  {"iDataSort" : 0},
                 /* Visit type */ null,
+                null,
                 /* Links */  null
             ]
         });

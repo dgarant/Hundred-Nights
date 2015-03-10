@@ -122,9 +122,23 @@
                 <h3>{{ num_unique_visitors }} Unique Visitors</h3>
                 <h3>{{ total_visits }} Visits Overall</h3>
                 <h3>{{ num_veteran_visits }} Veteran Visits ({{ num_visiting_veterans }} unique)</h3>
+                <h3>{{ num_male }} Male, {{ num_female }} Female</h3>
             </div>
             <div class="col-md-6">
-                <h3>{{ num_male }} Male, {{ num_female }} Female</h3>
+                <table>
+                    <thead>
+                        <th>Age</th>
+                        <th>Count</th>
+                    </thead>
+                    <tbody>
+                        {% for age, count in age_distr.items %}
+                        <tr>
+                            <td>{{age}}</td>
+                            <td>{{count}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="row">

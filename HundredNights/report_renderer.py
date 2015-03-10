@@ -2,6 +2,7 @@ import locale # for formatting
 
 import os
 import datetime
+from datetime import date
 from io import BytesIO
 from io import StringIO
 import csv
@@ -68,6 +69,18 @@ class ReportRenderer(object):
         num_veteran_visits = 0
         num_visiting_veterans = 0
 
+        # create age bins for fast lookup
+        age_map = dict()
+        end_points = [-1, 6, 13, 17, 24, 30, 40, 50, 65, 200]
+        for i in range(1, len(end_points)):
+            prev_val = end_points[i-1] + 1
+            val = end_points[i]
+            for age in range(prev_val, val+1):
+                if end_points[i] == 200:
+                    age_map[age] = "66+"
+                else:
+                    age_map[age] = "{0}-{1}".format(prev_val, val)
+
         ethnicity_choices = Visitor._meta.get_field_by_name("ethnicity")[0].choices
         ethnicity_info = self.__initialize_dict([c[1] for c in ethnicity_choices]) 
         ethnicity_info["Unknown"] = 0
@@ -81,7 +94,7 @@ class ReportRenderer(object):
         income_map[None] = "Unknown"
 
         num_male = 0 
-        age_info = dict()
+        age_info = self.__initialize_dict(age_map.values())
 
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
@@ -99,6 +112,8 @@ class ReportRenderer(object):
             ethnicity_info[ethnicity_map[visitor.ethnicity]] += 1
             income_info[income_map[visitor.income]] += 1
             num_male += int(visitor.gender == "M")
+
+            age_info[age_map[self.calculate_age(visitor.date_of_birth)]] += 1
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
@@ -130,6 +145,10 @@ class ReportRenderer(object):
                  "num_male" : num_male,
                  "num_female" : num_unique_visitors - num_male
                  })
+
+    def calculate_age(self, born):
+        today = date.today()
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
     def __initialize_dict(self, allowable_entries):
         d = collections.OrderedDict()

@@ -20,6 +20,15 @@ def bool_yn(bool_val):
         return "No"
 
 @register.filter
+def visit_response_notes(responses):
+    details = "\n".join(["{0}: {1}".format(r.question.title, r.details) for r in 
+        responses.filter(details__isnull = False, bool_response__exact = True).exclude(details__exact='')])
+    if details:
+        return "\n" + details
+    else:
+        return ""
+
+@register.filter
 def after_split_point(index, sequence):
     return index >= len(sequence) / 2.0
 
