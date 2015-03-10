@@ -113,7 +113,8 @@ class ReportRenderer(object):
             income_info[income_map[visitor.income]] += 1
             num_male += int(visitor.gender == "M")
 
-            age_info[age_map[self.calculate_age(visitor.date_of_birth)]] += 1
+            if visitor.date_of_birth:
+                age_info[age_map[self.calculate_age(visitor.date_of_birth)]] += 1
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
