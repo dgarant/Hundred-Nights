@@ -17,6 +17,38 @@ from itertools import chain
 from collections import defaultdict
 import collections
 
+class TwoWayCountTable(object):
+    """ Tracks counts of two discrete variables """
+
+    def __init__(self, states_var1, states_var2):
+        self.states_var1 = states_var1
+        self.states_var2 = states_var2
+        self.counts = dict()
+        for s1 in self.states_var1:
+            for s2 in self.states_var2:
+                self.counts[(s1, s2)] = 0
+
+    def add(self, val1, val2):
+        """ Incorporates the two variables into the table """
+        self.counts[(val1, val2)] += 1
+
+    def row_names(self):
+        return self.states_var1
+
+    def col_names(self):
+        return self.states_var2
+
+    def rows(self):
+        for s1 in self.states_var1:
+            row = []
+            for s2 in self.states_var2:
+                row.append(self.counts[(s1, s2)])
+            yield [s1] + row
+
+    def rows_with_total(self):
+        for row in self.rows():
+            yield [row[0]] + row[1:] + [sum(row[1:])]
+
 class ReportRenderer(object):
 
     def __init__(self):
@@ -69,8 +101,12 @@ class ReportRenderer(object):
         num_veteran_visits = 0
         num_visiting_veterans = 0
 
+        gender_choices = ["Female", "Male"]
+
         # create age bins for fast lookup
         age_map = dict()
+        distinct_age_vals = set()
+        age_vals = []
         end_points = [-1, 6, 13, 17, 24, 30, 40, 50, 65, 200]
         for i in range(1, len(end_points)):
             prev_val = end_points[i-1] + 1
@@ -80,21 +116,24 @@ class ReportRenderer(object):
                     age_map[age] = "66+"
                 else:
                     age_map[age] = "{0}-{1}".format(prev_val, val)
+                if not age_map[age] in distinct_age_vals:
+                    distinct_age_vals.add(age_map[age])
+                    age_vals.append(age_map[age])
 
         ethnicity_choices = Visitor._meta.get_field_by_name("ethnicity")[0].choices
-        ethnicity_info = self.__initialize_dict([c[1] for c in ethnicity_choices]) 
-        ethnicity_info["Unknown"] = 0
+        ethnicity_vals = [e[1] for e in ethnicity_choices]
+        ethnicity_table = TwoWayCountTable(ethnicity_vals, gender_choices)
         ethnicity_map = dict(ethnicity_choices)
         ethnicity_map[None] = "Unknown"
 
         income_choices = Visitor._meta.get_field_by_name("income")[0].choices
-        income_info = self.__initialize_dict([c[1] for c in income_choices]) 
-        income_info["Unknown"] = 0
+        income_vals = [i[1] for i in income_choices]
+        income_table = TwoWayCountTable(income_vals + ["Unknown", ], gender_choices)
         income_map = dict(income_choices)
         income_map[None] = "Unknown"
 
         num_male = 0 
-        age_info = self.__initialize_dict(age_map.values())
+        age_table = TwoWayCountTable(age_vals, gender_choices)
 
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
@@ -108,15 +147,19 @@ class ReportRenderer(object):
             overall_total_visits += num_visits
             num_visiting_veterans += 1 if visitor.veteran else 0
             num_veteran_visits += num_visits if visitor.veteran else 0
+            if visitor.gender == "M":
+                num_male += 1
+                gender_label = "Male"
+            else:
+                gender_label = "Female"
 
-            ethnicity_info[ethnicity_map[visitor.ethnicity]] += 1
-            income_info[income_map[visitor.income]] += 1
-            num_male += int(visitor.gender == "M")
+            ethnicity_table.add(ethnicity_map[visitor.ethnicity], gender_label)
+            income_table.add(income_map[visitor.income], gender_label)
 
             if visitor.date_of_birth:
                 curr_age = self.calculate_age(visitor.date_of_birth)
                 if curr_age in age_map:
-                    age_info[age_map[curr_age]] += 1
+                    age_table.add(age_map[curr_age], gender_label)
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
             visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
@@ -142,11 +185,11 @@ class ReportRenderer(object):
                  "num_veteran_visits" : num_veteran_visits,
                  "num_visiting_veterans" : num_visiting_veterans,
                  "visit_types" : visit_types,
-                 "ethnicity_distr" : ethnicity_info,
-                 "income_distr" : income_info,
-                 "age_distr" : age_info,
+                 "ethnicity_distr" : ethnicity_table,
+                 "income_distr" : income_table,
+                 "age_distr" : age_table,
                  "num_male" : num_male,
-                 "num_female" : num_unique_visitors - num_male
+                 "num_female" : num_unique_visitors - num_male,
                  })
 
     def calculate_age(self, born):

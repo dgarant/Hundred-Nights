@@ -37,9 +37,8 @@
                                 var table = $("<table></table>");
                                 $.each(data.respondents, function(i, row) {
                                     table.append("<tr>" + 
-                                        "<td width=\"50%\"></td>" + 
-                                        "<td width=\"30%\">" + row.name + "</td>" + 
-                                        "<td width=\"20%\"><a href=\"/edit-visitor/" + row.id + "\">Edit</a></td>" + 
+                                        "<td colspan=\"2\">" + row.name + "</td>" + 
+                                        "<td colspan=\"1\"><a href=\"/edit-visitor/" + row.id + "\">Edit</a></td>" + 
                                         "</tr>");
                                 });
                                 container.empty();
@@ -77,9 +76,8 @@
                                 var table = $("<table></table>");
                                 $.each(data.respondents, function(i, row) {
                                     table.append("<tr>" + 
-                                        "<td width=\"50%\"></td>" + 
-                                        "<td width=\"30%\">" + row.name + "</td>" + 
-                                        "<td width=\"20%\"><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
+                                        "<td colspan=\"2\">" + row.name + "</td>" + 
+                                        "<td><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
                                         "</tr>");
                                 });
                                 container.empty();
@@ -127,14 +125,20 @@
             <div class="col-md-6">
                 <table>
                     <thead>
-                        <th>Age</th>
-                        <th>Count</th>
+                        <tr>
+                            <th>Age</th>
+                            {% for col_name in age_distr.col_names %}
+                                <th>{{col_name}}</th>
+                            {% endfor %}
+                            <th>Total</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        {% for age, count in age_distr.items %}
+                        {% for row in age_distr.rows_with_total %}
                         <tr>
-                            <td>{{age}}</td>
-                            <td>{{count}}</td>
+                            {% for entry in row %}
+                            <td>{{entry}}</td>
+                            {% endfor %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -147,14 +151,18 @@
                     <thead>
                         <tr>
                             <th>Ethnicity</th>
-                            <th>Count</th>
+                            {% for col_name in ethnicity_distr.col_names %}
+                            <th>{{col_name}}</th>
+                            {% endfor %}
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                {% for ethnicity, count in ethnicity_distr.items %} 
+                {% for row in ethnicity_distr.rows_with_total %} 
                     <tr>
-                        <td>{{ ethnicity }}</td>
-                        <td>{{ count }}</td>
+                        {% for entry in row %}
+                        <td>{{ entry }}</td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
                     </tbody>
@@ -165,14 +173,18 @@
                     <thead>
                         <tr>
                             <th>Income</th>
-                            <th>Count</th>
+                            {% for col_name in income_distr.col_names %}
+                            <th>{{col_name}}</th>
+                            {% endfor %}
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                {% for income, count in income_distr.items %} 
+                {% for row in income_distr.rows_with_total %} 
                     <tr>
-                        <td>{{ income }}</td>
-                        <td>{{ count }}</td>
+                        {% for entry in row %}
+                        <td>{{ entry }}</td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
                     </tbody>

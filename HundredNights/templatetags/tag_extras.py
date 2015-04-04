@@ -21,12 +21,12 @@ def bool_yn(bool_val):
 
 @register.filter
 def visit_response_notes(responses):
-    details = "\n".join(["{0}: {1}".format(r.question.title, r.details) for r in 
-        responses.filter(details__isnull = False, bool_response__exact = True).exclude(details__exact='')])
+    details = u"\n".join([u"{0}: {1}".format(r.question.title, r.details) for r in 
+        responses.filter(details__isnull = False, bool_response__exact = True).exclude(details__exact=u'')])
     if details:
-        return "\n" + details
+        return u"\n" + details
     else:
-        return ""
+        return u""
 
 @register.filter
 def after_split_point(index, sequence):
