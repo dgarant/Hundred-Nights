@@ -162,10 +162,10 @@ class ReportRenderer(object):
                     age_table.add(age_map[curr_age], gender_label)
 
             unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
-            visitors_by_id_town[visitor.town_of_id.upper()] = [unique_visits+1, total_visits+num_visits]
+            visitors_by_id_town[visitor.town_of_id.upper().strip()] = [unique_visits+1, total_visits+num_visits]
 
             unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper().strip()]
-            visitors_by_resid_town[visitor.town_of_residence.upper()] = [unique_visits+1, total_visits+num_visits]
+            visitors_by_resid_town[visitor.town_of_residence.upper().strip()] = [unique_visits+1, total_visits+num_visits]
 
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 
