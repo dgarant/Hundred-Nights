@@ -12,6 +12,8 @@
 
     <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
     <script type="text/javascript" src="{% static "js/jquery-ui-1.10.3.custom.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/featherlight.min.js" %}"></script>
+    <link rel="stylesheet" href="{% static "css/featherlight.min.css"%}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
 
@@ -121,6 +123,7 @@
                 <h3>{{ total_visits }} Visits Overall</h3>
                 <h3>{{ num_veteran_visits }} Veteran Visits ({{ num_visiting_veterans }} unique)</h3>
                 <h3>{{ num_male }} Male, {{ num_female }} Female</h3>
+                <button data-featherlight="#visitor-names" class="btn btn-default">List Visitors</button>
             </div>
             <div class="col-md-6">
                 <table>
@@ -317,6 +320,12 @@
         </table>
         Number of unique towns of residence: {{ visitors_by_resid_town|length }}
         </div>
+        </div>
+
+        <div id="visitor-names">
+            {% for name in unique_visitor_names %}
+               {{ name }}<br />
+            {% endfor %}
         </div>
 
     </body>

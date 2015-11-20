@@ -135,6 +135,7 @@ class ReportRenderer(object):
         num_male = 0 
         age_table = TwoWayCountTable(age_vals, gender_choices)
 
+        unique_visitor_names = []
         for visitor in Visitor.objects \
                         .prefetch_related("visit_set", "visitorresponse_set"):
             num_visits = visitor.visit_set.filter(
@@ -144,6 +145,7 @@ class ReportRenderer(object):
             if num_visits == 0:
                  continue
             num_unique_visitors += 1
+            unique_visitor_names.append(visitor.name)
             overall_total_visits += num_visits
             num_visiting_veterans += 1 if visitor.veteran else 0
             num_veteran_visits += num_visits if visitor.veteran else 0
@@ -190,6 +192,7 @@ class ReportRenderer(object):
                  "age_distr" : age_table,
                  "num_male" : num_male,
                  "num_female" : num_unique_visitors - num_male,
+                 "unique_visitor_names" : sorted(unique_visitor_names)
                  })
 
     def calculate_age(self, born):
