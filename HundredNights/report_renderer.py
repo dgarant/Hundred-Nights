@@ -234,7 +234,8 @@ class ReportRenderer(object):
     def __create_visit_report_data(self, start_date, end_date):
         overnight_type = VisitType.objects.get(type='Overnight')
         resource_type = VisitType.objects.get(type='Resource Center')
-        other_type = VisitType.objects.get(type='Other')
+        other_types = [v.id for v in VisitType.objects.all() 
+                        if v.type not in ['Overnight', 'Resource Center']]
 
         overnight_visits = Visit.objects.filter(date__gte=start_date, 
                                              date__lte=end_date, 
@@ -244,7 +245,7 @@ class ReportRenderer(object):
                                              visit_type__exact=resource_type)
         other_visits = Visit.objects.filter(date__gte=start_date, 
                                              date__lte=end_date, 
-                                             visit_type__exact=other_type)
+                                             visit_type__in=other_types)
         return {
                 "overnight_visits" : overnight_visits, 
                 "resource_visits" : resource_visits, 
