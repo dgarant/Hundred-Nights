@@ -25,8 +25,17 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "HundredNights.settings")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 from django.core.wsgi import get_wsgi_application
-from django.contrib.staticfiles.handlers import StaticFilesHandler
-application = StaticFilesHandler(get_wsgi_application())
+_application = get_wsgi_application()
+
+def application(environ, start_response):
+    print(environ)
+    os.environ["HNIGHTS_DBNAME"] = environ.get("HNIGHTS_DBNAME")
+    os.environ["HNIGHTS_DB_USER"] = environ.get("HNIGHTS_DB_USER")
+    os.environ["HNIGHTS_DB_PASS"] = environ.get("HNIGHTS_DB_PASS")
+    os.environ["HNIGHTS_SECRET_KEY"] = environ.get("HNIGHTS_SECRET_KEY")
+
+    from django.contrib.staticfiles.handlers import StaticFilesHandler
+    return _application(environ, start_response)
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication

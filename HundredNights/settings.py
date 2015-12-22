@@ -16,7 +16,7 @@ if af_services:
     af_services = json.loads(af_services)
     host = af_services["postgresql-9.1"][0]["credentials"]["host"]
 else:
-    host = "localhost"
+    host = ""
 
 DATABASES = {
     'default': {

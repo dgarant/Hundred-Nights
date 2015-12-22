@@ -7,6 +7,9 @@
         div.spacer {
             margin: 5em;
         }
+	.lightbox {
+	    display: none;
+	}
         a:hover {cursor:pointer}
     </style>
 
@@ -322,7 +325,7 @@
         </div>
         </div>
 
-        <div id="visitor-names">
+        <div id="visitor-names" class="lightbox">
             {% for name in unique_visitor_names %}
                {{ name }}<br />
             {% endfor %}
