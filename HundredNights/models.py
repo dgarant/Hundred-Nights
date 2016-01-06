@@ -152,6 +152,7 @@ class VisitType(models.Model):
     """ A service provided by the shelter during a visit """
     type = models.CharField(max_length=50, unique=True, 
         verbose_name="Visit Type")
+    is_selectable = models.BooleanField(verbose_name="Selectable?", default=True)
 
     class Meta:
         verbose_name = "Visit Type"
@@ -244,7 +245,7 @@ class Volunteer(models.Model):
         return unicode(self.name)
     
 class VolunteerParticipation(models.Model):
-    """ An hourly log of a vsitor's stop at the shelter """
+    """ An hourly log of a visitor's stop at the shelter """
     date = models.DateField(verbose_name="Participation date")
     volunteer = models.ForeignKey(Volunteer, verbose_name="Volunteer")
     hours = models.DecimalField(max_digits=4, 
