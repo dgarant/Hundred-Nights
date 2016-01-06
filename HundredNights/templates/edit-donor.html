@@ -78,7 +78,7 @@
        {% for donation in donations %}
             <tr>
                 <td>{{ donation.date }}</td>
-                <td>{{ donation.amount|currency }}</td>
+                <td>{{ donation.amount}}</td>
                 <td>{{ donation.monetary|bool_yn }}</td>
                 <td>{{ donation.description }}</td>
                 <td>{{ donation.comment }}</td>
