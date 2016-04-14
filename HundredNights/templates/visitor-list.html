@@ -11,7 +11,7 @@
 
     <a href="{% url add-visitor %}" class="round-button" >Add Visitor</a>
 
-    <table class="data-table">
+    <table id="visitor-table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -35,6 +35,30 @@
         </tbody>
     </table>
 </fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var visitor_table = $("#visitor-table").dataTable({
+            "bLengthChange" : false,
+            "iDisplayLength": 100,
+            "sDom": 'T<"clear">lfrtip',
+            "oSearch" : {"sSearch" : "", "bSmart" : false},
+            "oTableTools": {
+                "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
+                "aButtons" : [
+                    {
+                        "sExtends" : "xls",
+                        "sTitle" : customExportTitle
+                    },
+                    {
+                        "sExtends" : "pdf",
+                        "sTitle" : customExportTitle
+                    }
+                ]
+            }
+        });
+    });
+</script>
 
 {% include "footer.html" %}
 

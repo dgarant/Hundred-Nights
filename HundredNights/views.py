@@ -142,10 +142,6 @@ def visit_respondents(request):
     start_date = request.POST.get("start_date", None)
     end_date = request.POST.get("end_date", None)
     visit_types = request.POST.getlist("visit_types", None)
-    print(visit_types)
-    print(question_id)
-    print(start_date)
-    print(end_date)
     if not question_id or not start_date or not end_date or not visit_types:
         return HttpResponse(simplejson.dumps(
                 {"result" : "error", 
