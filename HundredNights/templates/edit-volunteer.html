@@ -2,6 +2,7 @@
 {% load tabindex from tag_extras %}
 {% load currency from tag_extras %}
 {% load bool_yn from tag_extras %}
+{% load toticks from tag_extras %}
 {% include "topmatter.html" %}
 
 <form method="post" action="">
@@ -86,6 +87,7 @@
         <table id="part-table">
             <thead>
                 <tr>
+                    <th>Ticks</th>
                     <th>Date</th>
                     <th>Hours</th>
                     <th>Participation Type</th>
@@ -95,6 +97,7 @@
             <tbody>
                 {% for part in participation%}
                    <tr>
+                        <td>{{ part.date|toticks }}</td>
                         <td>{{ part.date }}</td>
                         <td>{{ part.hours}}</td>
                         <td>{{ part.participation_type }}</td>
@@ -121,8 +124,17 @@
             "oTableTools": {
                 "sSwfPath": "/static/swf/copy_csv_xls_pdf.swf",
                 "aButtons" : [ ]
-            }
+            },
+            "aoColumns": [ 
+                /* Ticks */   { "bSearchable": false,
+                                 "bVisible":    false },
+                /* Display date */  {"iDataSort" : 0},
+                null,
+                null,
+                null
+            ]
         });
+        part_table.fnSort([[1, "desc"]]);
     });
 </script>
 {% endif %}
