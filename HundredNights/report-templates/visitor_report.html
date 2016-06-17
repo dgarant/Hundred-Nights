@@ -4,11 +4,11 @@
 
         <div style="width: 800px; margin: 0 auto;">
         <h1>Visit Report: {{ start_date }} through {{ end_date }}</h1>
-
-        <table>
+        <table class="top-buffer">
             <tr>
                 <th>Name</th>
                 <th>Age</th>
+                <th>Veteran</th>
                 <th>Overnight</th>
                 <th>Resource Center</th>
                 <th>Other</th>
@@ -17,6 +17,7 @@
             <tr>
                 <td>{{ visitor.name }}</td>
                 <td>{{ visitor.age|replace_none:"-"  }}</td>
+                <td>{{ visitor.veteran|bool_yn  }}</td>
                 <td>{{ counts.0  }}</td>
                 <td>{{ counts.1  }}</td>
                 <td>{{ counts.2  }}</td>
