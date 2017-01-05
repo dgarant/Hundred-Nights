@@ -3,6 +3,7 @@
 {% load toticks from tag_extras %}
 {% load bool_yn from tag_extras %}
 {% load after_split_point from tag_extras %}
+{% load selected_choice from tag_extras %}
 {% load visit_response_notes from tag_extras %}
 {% include "topmatter.html" %}
 
@@ -18,8 +19,11 @@
     <div class="right">
 
         <label for="id_income">Income:</label>
-        {{ form.income.errors }}
-        {{ form.income|tabindex:7 }}
+        {{ form.income_val.errors }}
+        {{ form.income_val|tabindex:7 }}
+        {% if form.instance.income and not form.instance.income_val %}
+            (Previous: {{form|selected_choice:"income"}})
+        {% endif %}
 
         <label for="id_ethnicity">Ethnicity:</label>
         {{ form.ethnicity.errors }}

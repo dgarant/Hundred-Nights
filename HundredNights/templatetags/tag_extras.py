@@ -6,6 +6,10 @@ import locale
 register = template.Library()
 
 @register.filter
+def selected_choice(form, field_name):
+    return dict(form.fields[field_name].choices)[form[field_name].value()]
+
+@register.filter
 def currency(dollars):
     if not dollars:
         return ""

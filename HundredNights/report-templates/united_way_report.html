@@ -55,7 +55,7 @@
                     });
                 } else {
                     $(hiddenRow).hide(); 
-                    $(link).html("[Hide]");
+                    $(link).html("[Show]");
                 }
             }
 
@@ -143,8 +143,24 @@
                         {% for row in age_distr.rows_with_total %}
                         <tr>
                             {% for entry in row %}
-                            <td>{{entry}}</td>
+                            <td>{{ entry }}</td>
                             {% endfor %}
+                            <td>
+                                <form action="/visitor-filter/" method="post" class="show-visitor-data-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="age_filter" value="{{row.0}}" />
+                                    <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                                    <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                                    {% for visit_type in visit_types %}
+                                        <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                                    {% endfor %}
+                                    <a class="show-visitor-data">[Show]</a>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr style="display: none">
+                            <td colspan="3" class="visitor-container">
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -165,11 +181,27 @@
                     </thead>
                     <tbody>
                 {% for row in ethnicity_distr.rows_with_total %} 
-                    <tr>
-                        {% for entry in row %}
-                        <td>{{ entry }}</td>
-                        {% endfor %}
-                    </tr>
+                        <tr>
+                            {% for entry in row %}
+                            <td>{{ entry }}</td>
+                            {% endfor %}
+                            <td>
+                                <form action="/visitor-filter/" method="post" class="show-visitor-data-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="ethnicity_filter" value="{{row.0}}" />
+                                    <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                                    <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                                    {% for visit_type in visit_types %}
+                                        <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                                    {% endfor %}
+                                    <a class="show-visitor-data">[Show]</a>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr style="display: none">
+                            <td colspan="3" class="visitor-container">
+                            </td>
+                        </tr>
                 {% endfor %}
                     </tbody>
                 </table>
@@ -183,6 +215,7 @@
                             <th>{{col_name}}</th>
                             {% endfor %}
                             <th>Total</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -191,6 +224,22 @@
                         {% for entry in row %}
                         <td>{{ entry }}</td>
                         {% endfor %}
+                        <td>
+                            <form action="/visitor-filter/" method="post" class="show-visitor-data-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="income_filter" value="{{row.0}}" />
+                                <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                                <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                                {% for visit_type in visit_types %}
+                                    <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                                {% endfor %}
+                                <a class="show-visitor-data">[Show]</a>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr style="display: none">
+                        <td colspan="3" class="visitor-container">
+                        </td>
                     </tr>
                 {% endfor %}
                     </tbody>

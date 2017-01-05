@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'united-way-report/$', united_way_report, name='united-way-report'),
 
     # ancillary report data functions
+    url(r'visitor-filter/$', visitor_filter, name="visitor-filter"),
     url(r'visitor-respondents/$', visitor_respondents, name="visitor-respondents"),
     url(r'visit-respondents/$', visit_respondents, name="visit-respondents"),
 

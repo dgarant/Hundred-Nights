@@ -107,18 +107,38 @@ class ReportRenderer(object):
         age_map = dict()
         distinct_age_vals = set()
         age_vals = []
-        end_points = [-1, 6, 13, 17, 24, 30, 40, 50, 65, 200]
+        end_points = [-1, 5, 12, 17, 24, 35, 45, 55, 65, 75, 200]
         for i in range(1, len(end_points)):
             prev_val = end_points[i-1] + 1
             val = end_points[i]
             for age in range(prev_val, val+1):
                 if end_points[i] == 200:
-                    age_map[age] = "66+"
+                    age_map[age] = "{0}+".format(end_points[i-1]+1)
                 else:
                     age_map[age] = "{0}-{1}".format(prev_val, val)
                 if not age_map[age] in distinct_age_vals:
                     distinct_age_vals.add(age_map[age])
                     age_vals.append(age_map[age])
+
+        # setup income bins
+        income_bin_end_points = [-1, 11880, 17820, 23760, 23761, 29700]
+        income_options = [
+                "{0}+".format(income_bin_end_points[i]) 
+                    if (i == len(income_bin_end_points) - 1) 
+                    else "{0}-{1}".format(income_bin_end_points[i]+1, income_bin_end_points[i+1])
+                for i in range(len(income_bin_end_points))] + ["Unknown", ]
+
+        def get_income_category(income_val):
+            if not income_val or income_val < 0:
+                return "Unknown"
+            for i, v in enumerate(income_bin_end_points):
+                if income_val < v:
+                    return "{0}-{1}".format(income_bin_end_points[i-1]+1, v)
+
+            if i == len(income_bin_end_points) - 1:
+                return "{0}+".format(val+1)
+
+                
 
         ethnicity_choices = Visitor._meta.get_field_by_name("ethnicity")[0].choices
         ethnicity_vals = [e[1] for e in ethnicity_choices]
@@ -128,9 +148,7 @@ class ReportRenderer(object):
 
         income_choices = Visitor._meta.get_field_by_name("income")[0].choices
         income_vals = [i[1] for i in income_choices]
-        income_table = TwoWayCountTable(income_vals + ["Unknown", ], gender_choices)
-        income_map = dict(income_choices)
-        income_map[None] = "Unknown"
+        income_table = TwoWayCountTable(income_options, gender_choices)
 
         num_male = 0 
         age_table = TwoWayCountTable(age_vals, gender_choices)
@@ -156,7 +174,7 @@ class ReportRenderer(object):
                 gender_label = "Female"
 
             ethnicity_table.add(ethnicity_map[visitor.ethnicity], gender_label)
-            income_table.add(income_map[visitor.income], gender_label)
+            income_table.add(get_income_category(visitor.income_val), gender_label)
 
             if visitor.date_of_birth:
                 curr_age = self.calculate_age(visitor.date_of_birth)

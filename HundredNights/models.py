@@ -89,6 +89,9 @@ class Visitor(models.Model):
         verbose_name="Town of ID", null=True, blank=True)
     veteran = models.BooleanField(
         verbose_name="Is this visitor a veteran?")
+    income_val = models.DecimalField(max_digits=15, 
+        decimal_places=0, verbose_name="Income",
+        null=True, blank=True)
     income = models.CharField(max_length=50, null=True, blank=True, 
         choices=(
                     (INCOME_LEVEL_1, "$0-$9,9999"),

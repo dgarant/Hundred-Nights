@@ -94,6 +94,82 @@ def participation_report(request):
     else:
         return renderer.create_participation_report_csv(start_date, end_date)
 
+@login_required
+@csrf_protect
+def visitor_filter(request):
+    ethnicity_filter = request.POST.get("ethnicity_filter", None)
+    age_filter = request.POST.get("age_filter", None)
+    income_filter = request.POST.get("income_filter", None)
+    start_date = request.POST.get("start_date", None)
+    end_date = request.POST.get("end_date", None)
+    visit_type_ids = request.POST.getlist("visit_types", None)
+    if not start_date or not end_date or not visit_type_ids:
+        return HttpResponse(simplejson.dumps(
+                {"result" : "error", 
+                 "message" : "Missing one or more required parameters. " + 
+                    "Expected question_id, start_date, end_date, and visit_type"}), 
+                    content_type="application/json")
+    try:
+        start_date = parser.parse(start_date)
+        end_date = parser.parse(end_date)
+    except Exception as ex:
+        return HttpResponse(simplejson.dumps(
+                {"result" : "error", 
+                 "message" : "Failed to parse a supplied date. " + 
+                             "Message was {0}.".format(ex)}),
+                    content_type="application/json")
+    
+    visit_query = Visit.objects.select_related("visitor").filter(
+            date__gte = start_date, date__lte = end_date, 
+            visit_type__id__in = visit_type_ids)
+
+    def income_match(income):
+        if income_filter:
+            if income_filter == "Unknown":
+                return (income is None or income < 0)
+            elif income is None or income < 0:
+                return False
+            elif "+" in income_filter and float(income_filter.replace("+", "")) > income:
+                return True
+            else:
+                lower, upper = income_filter.split("-")
+                return float(lower) <= income and float(upper) >= income
+        else:
+            return True
+
+    def ethnicity_match(ethnicity):
+        if ethnicity_filter:
+            return (ethnicity_filter == "Unknown" and ethnicity is None) or (ethnicity == ethnicity_filter)
+        else:
+            return True
+
+    today = datetime.now()
+    def age_match(date_of_birth):
+        if age_filter:
+            if age_filter == "Unknown":
+                return date_of_birth is None
+            elif date_of_birth is None:
+                return False
+            else: # age is  known
+                age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+                if "+" in age_filter and float(age_filter.replace("+", "")) <= age:
+                    return True
+                else:
+                    lower, upper = age_filter.split("-")
+                    return float(lower) <= age and float(upper) >= age
+        else:
+            return True
+
+    visitors = []
+    for v in visit_query:
+        if income_match(v.visitor.income_val) and ethnicity_match(v.visitor.get_ethnicity_display()) and age_match(v.visitor.date_of_birth):
+            visitors.append({"name" : v.visitor.name})
+
+    return HttpResponse(simplejson.dumps(
+                {
+                    "result" : "success", 
+                    "respondents" : visitors
+                 }), content_type="application/json")
 
 @login_required
 @csrf_protect

@@ -5,3 +5,8 @@ local_settings.py
 data.s3db
 activate.sh
 activate.bat
+*.pem
+*.ppk
+notes.txt
+rootkey.csv
+*.un~
