@@ -161,14 +161,17 @@ def visitor_filter(request):
             return True
 
     visitors = []
+    saw_visitor_ids = set()
     for v in visit_query:
-        if income_match(v.visitor.income_val) and ethnicity_match(v.visitor.get_ethnicity_display()) and age_match(v.visitor.date_of_birth):
-            visitors.append({"name" : v.visitor.name})
+        if not v.visitor.id in saw_visitor_ids:
+            saw_visitor_ids.add(v.visitor.id)
+            if income_match(v.visitor.income_val) and ethnicity_match(v.visitor.get_ethnicity_display()) and age_match(v.visitor.date_of_birth):
+                visitors.append({"name" : v.visitor.name})
 
     return HttpResponse(simplejson.dumps(
                 {
                     "result" : "success", 
-                    "respondents" : visitors
+                    "respondents" : sorted(visitors, key=lambda x: x["name"])
                  }), content_type="application/json")
 
 @login_required
