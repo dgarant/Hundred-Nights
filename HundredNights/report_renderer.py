@@ -121,9 +121,9 @@ class ReportRenderer(object):
                     age_vals.append(age_map[age])
 
         # setup income bins
-        income_bin_end_points = [-1, 11880, 17820, 23760, 23761, 29700]
+        income_bin_end_points = [-1, 11880, 17820, 23760, 29700]
         income_options = [
-                "{0}+".format(income_bin_end_points[i]) 
+                "{0}+".format(income_bin_end_points[i]+1) 
                     if (i == len(income_bin_end_points) - 1) 
                     else "{0}-{1}".format(income_bin_end_points[i]+1, income_bin_end_points[i+1])
                 for i in range(len(income_bin_end_points))] + ["Unknown", ]
@@ -136,7 +136,7 @@ class ReportRenderer(object):
                     return "{0}-{1}".format(income_bin_end_points[i-1]+1, v)
 
             if i == len(income_bin_end_points) - 1:
-                return "{0}+".format(val+1)
+                return "{0}+".format(v+1)
 
                 
 
@@ -146,8 +146,6 @@ class ReportRenderer(object):
         ethnicity_map = dict(ethnicity_choices)
         ethnicity_map[None] = "Unknown"
 
-        income_choices = Visitor._meta.get_field_by_name("income")[0].choices
-        income_vals = [i[1] for i in income_choices]
         income_table = TwoWayCountTable(income_options, gender_choices)
 
         num_male = 0 
