@@ -129,8 +129,8 @@ def visitor_filter(request):
                 return (income is None or income < 0)
             elif income is None or income < 0:
                 return False
-            elif "+" in income_filter and float(income_filter.replace("+", "")) > income:
-                return True
+            elif "+" in income_filter:
+                return income >= float(income_filter.replace("+", ""))
             else:
                 lower, upper = income_filter.split("-")
                 return float(lower) <= income and float(upper) >= income

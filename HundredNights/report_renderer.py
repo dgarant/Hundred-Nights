@@ -129,7 +129,7 @@ class ReportRenderer(object):
                 for i in range(len(income_bin_end_points))] + ["Unknown", ]
 
         def get_income_category(income_val):
-            if not income_val or income_val < 0:
+            if income_val is None or income_val < 0:
                 return "Unknown"
             for i, v in enumerate(income_bin_end_points):
                 if income_val < v:
