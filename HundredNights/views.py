@@ -457,10 +457,14 @@ def edit_visitor(request, visitor_id=None):
                 returns a rediection to the visitor list
     """
     visitor = None
+    alert = None
     try:
         visitor = Visitor.objects.select_related().get(id=visitor_id)
         visits = visitor.visit_set.select_related("visitquestion_set").all()
-
+        last_check_in = max([v.date for v in visits]) if visits else None
+        if not last_check_in is None and last_check_in < (datetime.now()- relativedelta(years=2)).date():
+            alert = "It has been over two years since the last check-in. Consider collecting new information."
+        
         # attach new questions
         new_questions = [q for q in VisitorQuestion.objects.all() 
                         if not q in [r.question for r in visitor.visitorresponse_set.all()]]
@@ -493,6 +497,7 @@ def edit_visitor(request, visitor_id=None):
         {
             "form" : form, 
             "visits" : visits, 
+            "alert" : alert,
             "question_forms" : qforms,
          })
 

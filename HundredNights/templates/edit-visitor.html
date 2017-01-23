@@ -7,6 +7,12 @@
 {% load visit_response_notes from tag_extras %}
 {% include "topmatter.html" %}
 
+{% if alert %}
+    <div style="color: red; font-weight: bold">
+        {{ alert }}
+    </div>
+{% endif %}
+
 {% if form.instance.id %}
 <form method="post" action="{% url edit-visitor form.instance.id %}">
 {% else %}
