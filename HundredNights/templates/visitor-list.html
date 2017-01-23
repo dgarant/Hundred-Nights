@@ -34,6 +34,13 @@
         {% endfor %}
         </tbody>
     </table>
+
+    {% if year_filter != None %}
+    <br/>
+    <br/>
+    <br/>
+    <span style="font-weight: bold">Showing only visitors checked in within the last {{ year_filter }} years. <a href="{% url visitors %}">Click to show all visitors instead.</a>
+    {% endif %}
 </fieldset>
 
 <script type="text/javascript">

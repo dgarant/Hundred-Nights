@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from datetime import datetime, timedelta
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from django.db import DatabaseError
 from django.db.models import Sum, Count
 from django.forms.models import modelformset_factory, inlineformset_factory
@@ -14,8 +15,10 @@ from django.core import serializers
 from django.utils import simplejson
 from django.db import connection
 from django.http import HttpResponse
+import django
 from report_renderer import ReportRenderer
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 import csv, sys, os
 
 @login_required
@@ -412,10 +415,36 @@ def visitor_check_in_overnight(request, visitor_id):
     return redirect('edit-visit', visitor_id=visitor_id, visit_id=visit.id)
 
 @login_required
-def visit_log(request):
+def visitor_lookup(request):
+    return render(request, 'bs_template.html')
+
+@login_required
+def visitor_search_api(request):
+    name_filter = request.GET.get('name', None)
+    vobjs = Visitor.objects.annotate(django.db.models.Max("visit__date"))
+    if name_filter:
+        results = vobjs.filter(name__icontains = name_filter)
+    else:
+        results = vobjs.objects.all()
+
+    return HttpResponse(simplejson.dumps([{
+                "name" : v.name, "town_of_residence" : v.town_of_residence, 
+                "town_of_id" : v.town_of_id, "id" : v.id, 
+                "latest_check_in" : v.visit__date__max.isoformat() if v.visit__date__max else None} 
+                    for v in results]),
+                 content_type="application/json")
+
+@login_required
+def visit_log(request, history_years=None):
     """ Presents a view of all visitors """
+    if history_years:
+        visitor_ids = Visit.objects.filter(date__gte = datetime.now() - relativedelta(years=2)).values_list("visitor__id", flat=True).distinct()
+        visitors = Visitor.objects.filter(id__in = visitor_ids)
+    else:
+        visitors = Visitor.objects.all()
+
     return render(request, 'visitor-list.html', 
-            {"visitors" : Visitor.objects.all()})
+            {"visitors" : visitors, "year_filter" : history_years})
 
 @login_required
 def edit_visitor(request, visitor_id=None):

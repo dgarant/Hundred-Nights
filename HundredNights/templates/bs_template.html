@@ -1,0 +1,73 @@
+{% load tabindex from tag_extras %}
+{% load toticks from tag_extras %}
+{% load bool_yn from tag_extras %}
+{% load after_split_point from tag_extras %}
+{% load selected_choice from tag_extras %}
+{% load visit_response_notes from tag_extras %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hundred Nights Database</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/bsstyle.css" />
+        <!--[if lt IE 7]>
+            <link rel="stylesheet" type="text/css" href="/static/css/style-ie.css" />
+        <![endif]-->
+        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+        <script type="text/javascript" src="/static/js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/static/js/underscore-min.js"></script>
+        <script type="text/javascript" src="/static/js/angular.min.js"></script>
+        <script type="text/javascript" src="/static/js/angular-route.min.js"></script>
+        <script type="text/javascript" src="/static/js/app.js"></script>
+
+    </head>
+    <body>
+        <div id="page-wrap">
+            <div id="inside">
+                <div class="row" style="margin-left: 0px; margin-right: 0px">
+                    <div id="header">
+                        <a href="/"><img src="/static/images/hundrednights.png" /></a>
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-left: 0px; margin-right: 0px">
+                <div id="left-sidebar" class="col-sm-2" style="padding-left: 0px">
+                    <ul style="margin-bottom: 0px; padding: 0px">
+                        <li>
+                            <a href="{% url visitor-lookup %}">Visitor Lookup</a>
+                        </li>
+                        <li>
+                            <a href="{% url visitors 2 %}">Visitor List</a>
+                        </li>
+                        <li>
+                            <a href="{% url volunteers %}">Volunteers</a>
+                        </li>
+                        <li>
+                            <a href="{% url donors %}">Donors</a>
+                        </li>
+                        <li>
+                            <a href="{% url referrers %}">Referrals</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url logout %}">Log Out</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div id="main-content" class="col-md-8" ng-app="HNights" ng-view>
+                </div>
+            </div>
+
+                <div id="footer">
+                </div>
+
+            </div>
+
+            <div style="clear:both;"></div>
+        </div>
+   </body>
+</html>

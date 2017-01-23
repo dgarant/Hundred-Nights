@@ -1,0 +1,46 @@
+<div class="row">
+
+    <div class="alert alert-danger" ng-hide="isEmptyLike(error)">
+        {{ error }}
+    </div>
+
+    <div class="row">
+        <div class="col-md-2 pull-right">
+            <a href="/add-visitor/" class="btn btn-primary" >Add Visitor</a>
+        </div>
+    </div>
+
+    <div class="row top-buffer">
+        <div class="col-md-6 form-inline">
+            <form ng-submit="search()">
+                <input type="text" class="form-control" placeholder="Search by name..." id="search-box" ng-model="searchKey" />
+                <button class="btn btn-info" ng-disabled="isEmptyLike(searchKey)" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row" ng-hide="isEmptyLike(visitors)">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Town of Residence</th>
+                    <th>Town of ID</th>
+                    <th>Last Check-in</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="visitor in visitors">
+                    <td>{{visitor.name}}</td>
+                    <td>{{visitor.town_of_residence}}</td>
+                    <td>{{visitor.town_of_id}}</td>
+                    <td>{{visitor.latest_check_in}}</td>
+                    <td><a href="/edit-visitor/{{visitor.id}}">Edit</a> | 
+                        <a ng-click="delete(visitor)">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

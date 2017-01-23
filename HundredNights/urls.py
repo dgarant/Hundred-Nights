@@ -28,7 +28,9 @@ urlpatterns = patterns('',
                 name='volunteer-hours-by-month'),
 
     # visitor-related functions
-    url(r'^visitors$', visit_log, name="visitors"),
+    url(r'^api/visitor-search/$', visitor_search_api, name="visitor-search"),
+    url(r'^visitor-lookup/$', visitor_lookup, name="visitor-lookup"),
+    url(r'^visitors/(?P<history_years>\d{1,10})?$', visit_log, name="visitors"),
     url(r'^edit-visitor/(?P<visitor_id>\d{1,10})$', edit_visitor, name='edit-visitor'),
     url(r'^add-visitor/$', edit_visitor, name='add-visitor'),
     url(r'^delete-visitor/(?P<visitor_id>\d{1,10})$', delete_visitor, name='delete-visitor'),
