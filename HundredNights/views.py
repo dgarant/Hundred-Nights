@@ -101,6 +101,8 @@ def participation_report(request):
 @csrf_protect
 def visitor_filter(request):
     ethnicity_filter = request.POST.get("ethnicity_filter", None)
+    town_of_id_filter = request.POST.get("town_of_id_filter", None)
+    town_of_resid_filter = request.POST.get("town_of_resid_filter", None)
     age_filter = request.POST.get("age_filter", None)
     income_filter = request.POST.get("income_filter", None)
     start_date = request.POST.get("start_date", None)
@@ -163,12 +165,20 @@ def visitor_filter(request):
         else:
             return True
 
+    def town_match(town, town_filter):
+        return (town_filter is None or 
+                town.upper().strip() == town_filter.upper().strip())
+
     visitors = []
     saw_visitor_ids = set()
     for v in visit_query:
         if not v.visitor.id in saw_visitor_ids:
             saw_visitor_ids.add(v.visitor.id)
-            if income_match(v.visitor.income_val) and ethnicity_match(v.visitor.get_ethnicity_display()) and age_match(v.visitor.date_of_birth):
+            if (income_match(v.visitor.income_val) and 
+                    ethnicity_match(v.visitor.get_ethnicity_display()) and 
+                    age_match(v.visitor.date_of_birth) and
+                    town_match(v.visitor.town_of_id, town_of_id_filter) and
+                    town_match(v.visitor.town_of_residence, town_of_resid_filter)):
                 visitors.append({"name" : v.visitor.name})
 
     return HttpResponse(simplejson.dumps(

@@ -335,6 +335,7 @@
                     <th>Town of ID</th>
                     <th>Unique Visitors</th>
                     <th>Total Visits</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -343,6 +344,18 @@
                     <td>{{ town }}</td>
                     <td>{{ unique_count }}</td>
                     <td>{{ total_count }}</td>
+                    <td>
+                        <form action="/visitor-filter/" method="post" class="show-visitor-data-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="town_of_id_filter" value="{{town}}" />
+                            <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                            <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                            {% for visit_type in visit_types %}
+                                <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                            {% endfor %}
+                            <a class="show-visitor-data">[Show]</a>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -358,6 +371,7 @@
                     <th>Town of Residence</th>
                     <th>Unique Visitors</th>
                     <th>Total Visits</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -366,6 +380,18 @@
                     <td>{{ town }}</td>
                     <td>{{ unique_count }}</td>
                     <td>{{ total_count }}</td>
+                    <td>
+                        <form action="/visitor-filter/" method="post" class="show-visitor-data-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="town_of_resid_filter" value="{{town}}" />
+                            <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                            <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                            {% for visit_type in visit_types %}
+                                <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                            {% endfor %}
+                            <a class="show-visitor-data">[Show]</a>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
