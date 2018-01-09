@@ -179,7 +179,7 @@ def visitor_filter(request):
                     age_match(v.visitor.date_of_birth) and
                     town_match(v.visitor.town_of_id, town_of_id_filter) and
                     town_match(v.visitor.town_of_residence, town_of_resid_filter)):
-                visitors.append({"name" : v.visitor.name})
+                visitors.append({"name" : v.visitor.name, "id" : v.visitor.id})
 
     return HttpResponse(simplejson.dumps(
                 {
