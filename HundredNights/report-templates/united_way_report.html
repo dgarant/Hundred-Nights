@@ -7,9 +7,21 @@
         div.spacer {
             margin: 5em;
         }
-	.lightbox {
-	    display: none;
-	}
+
+        .lightbox {
+            display: none;
+        }
+
+        @media print {
+            [class*="col-md"], [class*="col-sm"], [class*="col-xs"] {
+                float: none;
+            }
+
+            .container {
+                width:100%;
+            }
+        }
+
         a:hover {cursor:pointer}
     </style>
 
