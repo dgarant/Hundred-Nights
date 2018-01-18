@@ -304,10 +304,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>Prompt</th>
-                    <th>Affirmative Responses</th>
-                    <th>Unique Respondents</th>
-                    <th></th>
+                    <th style="width: 30%">Prompt</th>
+                    <th style="width: 20%">Affirmative Responses</th>
+                    <th style="width: 20%">Unique Respondents</th>
+                    <th style="width: 30%"></th>
                 </tr>
             </thead>
             <tbody>
@@ -317,16 +317,30 @@
                 <td>{{ count }}</td>
                 <td>{{ unique_visitors }}</td>
                 <td>
+
                     <form action="/visit-respondents/" method="post" class="show-visitor-data-form">
                         {% csrf_token %}
                         <input type="hidden" name="question_id" value="{{question.id}}" />
                         <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
                         <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                        <input type="hidden" name="response_type" value="true"/>
                         {% for visit_type in visit_types %}
                             <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
                         {% endfor %}
-                        <a class="show-visit-data">[Show]</a>
+                        <a class="show-visit-data">[Show Affirmative]</a>
                     </form>
+                    <form action="/visit-respondents/" method="post" class="show-visitor-data-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="question_id" value="{{question.id}}" />
+                        <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                        <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                        <input type="hidden" name="response_type" value="false"/>
+                        {% for visit_type in visit_types %}
+                            <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                        {% endfor %}
+                        <a class="show-visit-data">[Show Negative]</a>
+                    </form>
+
                 </td>
             </tr>
             <tr style="display:none">

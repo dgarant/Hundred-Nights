@@ -233,6 +233,7 @@ def visit_respondents(request):
     question_id = request.POST.get("question_id", None)
     start_date = request.POST.get("start_date", None)
     end_date = request.POST.get("end_date", None)
+    affirmative_resp = request.POST.get("response_type", "true").lower()[0] == "t"
     visit_types = request.POST.getlist("visit_types", None)
     if not question_id or not start_date or not end_date or not visit_types:
         return HttpResponse(simplejson.dumps(
@@ -251,7 +252,7 @@ def visit_respondents(request):
                     content_type="application/json")
     
     responses = VisitResponse.objects.select_related("visit__visitor").filter(
-        question__id=question_id, bool_response=True, visit__date__gte = start_date,
+        question__id=question_id, bool_response=affirmative_resp, visit__date__gte = start_date,
         visit__date__lte = end_date, visit__visit_type__id__in = visit_types)
 
     respondents = []
