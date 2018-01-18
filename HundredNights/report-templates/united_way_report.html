@@ -90,10 +90,10 @@
                             if(data["result"] == "error") {
                                 alert(data["message"]);
                             } else {
-                                var table = $("<table></table>");
+                                var table = $("<table style='border-left: 1px solid;'></table>");
                                 $.each(data.respondents, function(i, row) {
                                     table.append("<tr>" + 
-                                        "<td colspan=\"2\">" + row.name + "</td>" + 
+                                        "<td colspan=\"3\">" + row.name + "</td>" + 
                                         "<td><a href=\"/edit-visit/" + row.visitorid + "/" + row.id + "\">Edit</a></td>" + 
                                         "</tr>");
                                 });
@@ -344,7 +344,7 @@
                 </td>
             </tr>
             <tr style="display:none">
-                <td colspan="3" class="visit-container"></td>
+                <td colspan="4" class="visit-container"></td>
             </tr>
         {% endfor %}
             </tbody>
