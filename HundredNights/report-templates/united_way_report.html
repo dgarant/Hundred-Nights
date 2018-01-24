@@ -51,7 +51,7 @@
                             if(data["result"] == "error") {
                                 alert(data["message"]);
                             } else {
-                                var table = $("<table></table>");
+                                var table = $("<table style='border-left: 1px solid;'></table>");
                                 $.each(data.respondents, function(i, row) {
                                     table.append("<tr>" + 
                                         "<td colspan=\"2\">" + row.name + "</td>" + 
@@ -61,13 +61,11 @@
                                 container.empty();
                                 container.append(table);
                                 $(hiddenRow).show(); 
-                                $(link).html("[Hide]");
                             }
                         }
                     });
                 } else {
                     $(hiddenRow).hide(); 
-                    $(link).html("[Show]");
                 }
             }
 
@@ -100,13 +98,11 @@
                                 container.empty();
                                 container.append(table);
                                 $(hiddenRow).show(); 
-                                $(this).html("[Hide]");
                             }
                         }
                     });
                 } else {
                     $(hiddenRow).hide(); 
-                    $(this).html("[Show]");
                 }
             }
 
@@ -278,16 +274,28 @@
                         <td>{{ question.prompt }}</td>
                         <td>{{ count }} </td>
                         <td>
-                        <form action="/visitor-respondents/" method="post" class="show-visitor-data-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="question_id" value="{{question.id}}" />
-                            <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
-                            <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
-                            {% for visit_type in visit_types %}
-                                <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
-                            {% endfor %}
-                            <a class="show-visitor-data">[Show]</a>
-                        </form>
+                            <form action="/visitor-respondents/" method="post" class="show-visitor-data-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="question_id" value="{{question.id}}" />
+                                <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                                <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                                <input type="hidden" name="response_type" value="true"/>
+                                {% for visit_type in visit_types %}
+                                    <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                                {% endfor %}
+                                <a class="show-visitor-data">[Show Affirmative]</a>
+                            </form>
+                            <form action="/visitor-respondents/" method="post" class="show-visitor-data-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="question_id" value="{{question.id}}" />
+                                <input type="hidden" name="start_date" value="{{start_date|date:"c"}}" />
+                                <input type="hidden" name="end_date" value="{{end_date|date:"c"}}" />
+                                <input type="hidden" name="response_type" value="false"/>
+                                {% for visit_type in visit_types %}
+                                    <input type="hidden" name="visit_types" value="{{visit_type.id}}" />
+                                {% endfor %}
+                                <a class="show-visitor-data">[Show Negative]</a>
+                            </form>
                         </td>
                     </tr>
                     <tr style="display: none">

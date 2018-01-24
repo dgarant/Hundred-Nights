@@ -222,53 +222,52 @@ class ReportRenderer(object):
         return d
 
     def create_visit_report_csv(self, start_date, end_date):
-        data_dict = self.__create_visit_report_data(start_date, end_date)
-        visits = data_dict['overnight_visits'] | data_dict['resource_visits'] | data_dict['other_visits']
-        filename = 'HundredNightsVisits-{0}-thru-{1}.csv'.format(data_dict['start_date'], data_dict['end_date'])
+        visit_info = self.__create_visit_report_data(start_date, end_date)
+        visits = visit_info["visits"]
+
+        unique_questions = set()
+        for v in visits:
+            v.indexed_responses = dict()
+            for r in v.visitresponse_set.all():
+                unique_questions.add(r.question)
+                v.indexed_responses[r.question.title] = "Y" if r.bool_response else "N"
+
+        visit_questions = sorted([q for q in unique_questions], key=lambda x: x.title)
+        question_cols = [q.title for q in visit_questions]
+
+        filename = 'HundredNightsVisits-{0}-thru-{1}.csv'.format(visit_info['start_date'], visit_info['end_date'])
         data = [[v.visitor.name, v.visitor.date_of_birth, v.visitor.town_of_residence, 
-                 v.visitor.town_of_id, v.visitor.veteran, v.visit_type, v.date, v.comment]
+                 v.visitor.town_of_id, v.visitor.veteran, v.visit_type, v.date, v.comment] + [v.indexed_responses.get(col) for col in question_cols]
                 for v in visits]
+
         return self.__render_to_csv(['Name', 'Birth Date', 'Town of Residence', 
                                      'Town of ID', 'Veteran?', 'Visit Type', 
-                                     'Date', 'Comment'], data, filename)
+                                     'Date', 'Comment'] + question_cols, data, filename)
 
     def create_visit_report_html(self, request, start_date, end_date):
-        data = self.__create_visit_report_data(start_date, end_date)
+        visit_info = self.__create_visit_report_data(start_date, end_date)
+        overnight_visits = [v for v in visit_info["visits"] if v.visit_type.type == "Overnight"]
+        resource_visits = [v for v in visit_info["visits"] if v.visit_type.type == "Resource Center"]
+        other_visits = [v for v in visit_info["visits"] if not v.visit_type.type in ["Overnight", "Resource Center"]]
 
         # more terse format for HTML - create a table of counts on a per-visitor basis
         visitors = defaultdict(lambda: [0, 0, 0]) # to map visitor to list of counts [overnight, resource, other]
-        for visit in data["overnight_visits"]:
+        for visit in overnight_visits:
             visitors[visit.visitor][0] += 1
-        for visit in data["resource_visits"]:
+        for visit in resource_visits:
             visitors[visit.visitor][1] += 1
-        for visit in data["other_visits"]:
+        for visit in other_visits:
             visitors[visit.visitor][2] += 1
 
         return self.__render_to_html('visitor_report.html', request, {"visit_dict" : dict(visitors), 
-                    "start_date" : data["start_date"], "end_date" : data["end_date"]})
+                    "start_date" : visit_info["start_date"], "end_date" : visit_info["end_date"]})
 
     def __create_visit_report_data(self, start_date, end_date):
-        overnight_type = VisitType.objects.get(type='Overnight')
-        resource_type = VisitType.objects.get(type='Resource Center')
-        other_types = [v.id for v in VisitType.objects.all() 
-                        if v.type not in ['Overnight', 'Resource Center']]
+        all_visits = (Visit.objects.filter(date__gte=start_date, date__lte=end_date)
+            .prefetch_related("visitresponse_set", "visitresponse_set__question", "visit_type")).all()
 
-        overnight_visits = Visit.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             visit_type__exact=overnight_type)
-        resource_visits = Visit.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             visit_type__exact=resource_type)
-        other_visits = Visit.objects.filter(date__gte=start_date, 
-                                             date__lte=end_date, 
-                                             visit_type__in=other_types)
         return {
-                "overnight_visits" : overnight_visits, 
-                "resource_visits" : resource_visits, 
-                "other_visits" : other_visits,
-                "unique_resource_visitor_count" : len(set([v.visitor.id for v in resource_visits])),
-                "unique_overnight_visitor_count" : len(set([v.visitor.id for v in overnight_visits])),
-                "unique_other_visitor_count" : len(set([v.visitor.id for v in other_visits])),
+                "visits" : all_visits, 
                 "start_date" : datetime.strftime(start_date, '%Y-%m-%d'),
                 "end_date" : datetime.strftime(end_date, '%Y-%m-%d')
                }
