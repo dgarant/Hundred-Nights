@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {"next_page" : "/"}, name="logout"),
 
     # report creation functions
+    url(r'visitor-report/$', visitor_report, name='visitor-report'),
     url(r'visit-report/$', visit_report, name='visit-report'),
     url(r'donation-report/$', donation_report, name='donation-report'),
     url(r'participation-report/$', participation_report, name='participation-report'),

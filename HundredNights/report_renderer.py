@@ -1,5 +1,6 @@
 import locale # for formatting
 
+import django
 import os
 import datetime
 from datetime import date
@@ -16,6 +17,7 @@ from HundredNights.models import *
 from itertools import chain
 from collections import defaultdict
 import collections
+from dateutil.relativedelta import relativedelta
 
 class TwoWayCountTable(object):
     """ Tracks counts of two discrete variables """
@@ -220,6 +222,36 @@ class ReportRenderer(object):
         for entry in allowable_entries:
             d[entry] = 0
         return d
+
+    def create_visitor_report_csv(self):
+        all_visitors = (Visitor.objects
+            .annotate(num_visits=django.db.models.Count("visit"),
+                      last_visit_date=django.db.models.Max("visit__date"))
+            .prefetch_related("visitorresponse_set", "visitorresponse_set__question")).all()
+
+        unique_questions = set()
+        for v in all_visitors:
+            v.indexed_responses = dict()
+            for r in v.visitorresponse_set.all():
+                unique_questions.add(r.question)
+                v.indexed_responses[r.question.title] = "Y" if r.bool_response else "N"
+
+        visitor_questions = sorted([q for q in unique_questions], key=lambda x: x.title)
+        question_cols = [q.title for q in visitor_questions]
+
+
+        filename = 'HundredNightsVisitors-{0}.csv'.format(datetime.now().strftime("%Y-%m-%d"))
+
+        data = [[v.name, v.date_of_birth, v.gender, v.town_of_residence, 
+                 v.town_of_id, v.veteran, v.income_val, v.ethnicity, v.last_visit_date, 
+                 (v.last_visit_date.year - v.date_of_birth.year) - ((v.last_visit_date.month, v.last_visit_date.day) < (v.date_of_birth.month, v.date_of_birth.day)) if v.last_visit_date else None
+                ]
+                 + [v.indexed_responses.get(col) for col in question_cols]
+                 for v in all_visitors]
+
+        headers = ["Name", "Birth Date", "Town of Residence", "Town of ID", 
+                   "Veteran?", "Income", "Ethnicity", "Last Visit Date", "Age at Last Visit"] + question_cols
+        return self.__render_to_csv(headers, data, filename)
 
     def create_visit_report_csv(self, start_date, end_date):
         visit_info = self.__create_visit_report_data(start_date, end_date)

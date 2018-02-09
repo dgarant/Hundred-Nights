@@ -49,6 +49,12 @@ def united_way_report(request):
                 request, start_date, end_date, visit_types)
 
 @login_required
+def visitor_report(request):
+    """ Creates a report rendering information about visitors """
+    renderer = ReportRenderer()
+    return renderer.create_visitor_report_csv()
+
+@login_required
 def visit_report(request):
     """ Creates a report representing visits over a time period """
     renderer = ReportRenderer()
