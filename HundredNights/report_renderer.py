@@ -123,7 +123,8 @@ class ReportRenderer(object):
                     age_vals.append(age_map[age])
 
         # setup income bins
-        income_bin_end_points = [-1, 11880, 17820, 23760, 29700]
+        #income_bin_end_points = [-1, 11880, 17820, 23760, 29700]
+        income_bin_end_points = [-1, 12140, 16753, 18210, 24280]
         income_options = [
                 "{0}+".format(income_bin_end_points[i]+1) 
                     if (i == len(income_bin_end_points) - 1) 
