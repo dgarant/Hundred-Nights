@@ -39,7 +39,8 @@ class VisitForm(forms.ModelForm):
     class Meta:
         model = Visit
         widgets = {
-            'visit' : forms.HiddenInput()
+            'visit' : forms.HiddenInput(),
+            'visitor' : forms.Select(attrs={"style" : "max-width: 220px"})
         }
 
 VisitQuestionForm = inlineformset_factory(Visit, VisitResponse,
