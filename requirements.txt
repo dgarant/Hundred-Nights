@@ -1,5 +1,5 @@
 dj-database-url==0.5.0
-Django==1.4
+Django==1.11.23
 django-extensions==1.6.1
 django-localflavor==2.2
 django-localflavor-us==1.1
