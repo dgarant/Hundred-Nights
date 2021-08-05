@@ -124,7 +124,8 @@ class ReportRenderer(object):
 
         # setup income bins
         #income_bin_end_points = [-1, 11880, 17820, 23760, 29700]
-        income_bin_end_points = [-1, 12140, 16753, 18210, 24280]
+        #income_bin_end_points = [-1, 12140, 16753, 18210, 24280]
+        income_bin_end_points = [-1, 0, 12880, 19320, 25760, 32200]
         income_options = [
                 "{0}+".format(income_bin_end_points[i]+1) 
                     if (i == len(income_bin_end_points) - 1) 
@@ -135,7 +136,7 @@ class ReportRenderer(object):
             if income_val is None or income_val < 0:
                 return "Unknown"
             for i, v in enumerate(income_bin_end_points):
-                if income_val < v:
+                if income_val <= v:
                     return "{0}-{1}".format(income_bin_end_points[i-1]+1, v)
 
             if i == len(income_bin_end_points) - 1:
