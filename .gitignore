@@ -10,3 +10,7 @@ activate.bat
 notes.txt
 rootkey.csv
 *.un~
+applog.txt
+.ipynb_checkpoints
+*.ipynb
+

@@ -1,21 +1,32 @@
 
-import models
+import HundredNights.models as models
 from django.contrib import admin
 
-admin.site.register(models.Donor)
-admin.site.register(models.Donation)
+class DonorAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+admin.site.register(models.Donor, DonorAdmin)
 
-admin.site.register(models.Visitor)
-admin.site.register(models.Visit)
-admin.site.register(models.VisitType)
+class VisitorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date_of_birth')
+admin.site.register(models.Visitor, VisitorAdmin)
 
-admin.site.register(models.Volunteer)
-admin.site.register(models.VolunteerParticipation)
-admin.site.register(models.ParticipationType)
+class VisitTypeAdmin(admin.ModelAdmin):
+    list_display = ('type', 'is_selectable')
+admin.site.register(models.VisitType, VisitTypeAdmin)
 
-admin.site.register(models.VisitorQuestion)
-admin.site.register(models.VisitorResponse)
+class VolunteerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date_of_birth')
+admin.site.register(models.Volunteer, VolunteerAdmin)
 
-admin.site.register(models.VisitQuestion)
-admin.site.register(models.VisitResponse)
+class ParticipationTypeAdmin(admin.ModelAdmin):
+    list_display = ('type', )
+admin.site.register(models.ParticipationType, ParticipationTypeAdmin)
+
+class VisitorQuestionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'prompt', 'type')
+admin.site.register(models.VisitorQuestion, VisitorQuestionAdmin)
+
+class VisitQuestionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'prompt', 'type', 'active')
+admin.site.register(models.VisitQuestion, VisitQuestionAdmin)
 

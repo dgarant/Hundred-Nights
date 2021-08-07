@@ -12,14 +12,14 @@ from django.db.models import Sum, Count
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.forms import widgets
 from django.core import serializers
-from django.utils import simplejson
 from django.db import connection
 from django.http import HttpResponse
 import django
-from report_renderer import ReportRenderer
+from HundredNights.report_renderer import ReportRenderer
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import csv, sys, os
+import json as simplejson
 
 @login_required
 def index(request):
@@ -373,7 +373,8 @@ def edit_visit(request, visitor_id, visit_id=None):
             new_questions = [q for q in VisitQuestion.objects.all()
                     if not q in [r.question for r in new_visit.visitresponse_set.all()]]
             for new_question in new_questions:
-                resp = VisitResponse.objects.create(visit=new_visit, question=new_question)
+                if new_question.active:
+                    resp = VisitResponse.objects.create(visit=new_visit, question=new_question)
             qforms = VisitQuestionForm(instance=new_visit)
     elif visit_id:
         form = VisitForm(instance=visit, 
@@ -846,7 +847,7 @@ def upload_donors(request):
 
         except Exception as ex:
             raise ValueError("{0}\nRow {1}\nRow Values: {2}".format(
-                    str(ex), row_num, row)), None, sys.exc_info()[2]
+                    str(ex), row_num, row)) from e
 
     return render(request, 'index.html', {})
 

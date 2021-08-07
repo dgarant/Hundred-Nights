@@ -11,5 +11,4 @@ python-stdnum==1.11
 pytz==2019.1
 simplejson==3.16.0
 six==1.11.0
-South==1.0.2
 typing==3.6.6

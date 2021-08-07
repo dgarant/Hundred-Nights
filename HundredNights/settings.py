@@ -116,28 +116,35 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 ROOT_URLCONF = 'HundredNights.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'HundredNights.wsgi.application'
 
-TEMPLATE_DIRS = (
-    os.path.join(SITE_ROOT, 'templates'),
-    os.path.join(SITE_ROOT, 'report-templates'),
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS' : [os.path.join(SITE_ROOT, 'templates'), os.path.join(SITE_ROOT, 'report-templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]    
+        }    
+    },
+]
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -152,7 +159,6 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'HundredNights',
-    'south'
 )
 
 # See http://docs.djangoproject.com/en/dev/topics/logging for
@@ -169,7 +175,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class' : 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/www/Hundred-Nights/applog.txt',
+            'filename': 'applog.txt',
             'maxBytes' : 1024*1024*10, # 10MB
             'backupCount' : 2
         }

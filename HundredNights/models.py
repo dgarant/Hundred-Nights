@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.localflavor.us.us_states import STATE_CHOICES
+from django_localflavor_us.us_states import STATE_CHOICES
 from HundredNights.models import *
 from datetime import datetime
 
@@ -39,7 +39,7 @@ class Donor(models.Model):
 class Donation(models.Model):
     """ Represents a monetary sum or an item that has been gifted. """
 
-    donor = models.ForeignKey(Donor, verbose_name="Donor")
+    donor = models.ForeignKey(Donor, verbose_name="Donor", on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=15, 
         decimal_places=2, verbose_name="Amount (if monetary)",
         null=True, blank=True)
@@ -140,8 +140,8 @@ class VisitorQuestion(models.Model):
 
 class VisitorResponse(models.Model):
     """ A response to a visitor question """
-    visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
-    question = models.ForeignKey(VisitorQuestion, verbose_name="Question")
+    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.PROTECT)
+    question = models.ForeignKey(VisitorQuestion, verbose_name="Question", on_delete=models.PROTECT)
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
 
     class Meta:
@@ -176,9 +176,9 @@ class ParticipationType(models.Model):
 
 class Visit(models.Model):
     """ A stop by a visitor at the shelter """
-    visitor = models.ForeignKey(Visitor, verbose_name="Visitor")
+    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.PROTECT)
     date = models.DateField(verbose_name="Visit Date", default=datetime.now)
-    visit_type = models.ForeignKey(VisitType, verbose_name="Visit Type")
+    visit_type = models.ForeignKey(VisitType, verbose_name="Visit Type", on_delete=models.PROTECT)
     comment = models.TextField(verbose_name="Comments", null=True, blank=True)
 
     class Meta:
@@ -197,6 +197,8 @@ class VisitQuestion(models.Model):
             verbose_name="Detail Prompt", null=True, blank=True)
     type = models.CharField(max_length=50, choices=(("CHECKBOX", "Check Box"), 
                             ("CHECKBOX-DETS", "Check Box with Details")))
+    # indicates if this question should be visible in the UI
+    active = models.BooleanField(null=False, default=True)
 
     class Meta:
         verbose_name = "Visit Question"
@@ -206,8 +208,8 @@ class VisitQuestion(models.Model):
 
 class VisitResponse(models.Model):
     """ A response to a question which is asked at every visit """
-    visit = models.ForeignKey(Visit, verbose_name="Visit")
-    question = models.ForeignKey(VisitQuestion, verbose_name="Question")
+    visit = models.ForeignKey(Visit, verbose_name="Visit", on_delete=models.PROTECT)
+    question = models.ForeignKey(VisitQuestion, verbose_name="Question", on_delete=models.PROTECT)
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
     details = models.TextField(verbose_name="Details", null=True, blank=True)
 
@@ -250,13 +252,13 @@ class Volunteer(models.Model):
 class VolunteerParticipation(models.Model):
     """ An hourly log of a visitor's stop at the shelter """
     date = models.DateField(verbose_name="Participation date")
-    volunteer = models.ForeignKey(Volunteer, verbose_name="Volunteer")
+    volunteer = models.ForeignKey(Volunteer, verbose_name="Volunteer", on_delete=models.PROTECT)
     hours = models.DecimalField(max_digits=4, 
         decimal_places=2, verbose_name="Number of hours")
     num_participants = models.IntegerField(
         verbose_name="Number of participants (if group)", null=True, blank=True)
     participation_type = models.ForeignKey(ParticipationType, 
-        verbose_name="Participation Type")
+        verbose_name="Participation Type", on_delete=models.PROTECT)
     comment = models.TextField(verbose_name="Comments", null=True, blank=True)
 
     class Meta:
@@ -275,12 +277,12 @@ class Referrer(models.Model):
 
 class Referral(models.Model):
     """ An instance in which a referrer refers some visitors """
-    referrer = models.ForeignKey(Referrer)
+    referrer = models.ForeignKey(Referrer, on_delete=models.PROTECT)
     date = models.DateField()
     comment = models.TextField(null=True, blank=True)
 
 class ReferralVisitor(models.Model):
     """ Relates a referral to a visitor """
-    referral = models.ForeignKey(Referral)
-    visitor = models.ForeignKey(Visitor)
-    visit = models.ForeignKey(Visit, null=True, blank=True)
+    referral = models.ForeignKey(Referral, on_delete=models.PROTECT)
+    visitor = models.ForeignKey(Visitor, on_delete=models.PROTECT)
+    visit = models.ForeignKey(Visit, null=True, blank=True, on_delete=models.PROTECT)
