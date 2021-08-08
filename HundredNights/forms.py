@@ -36,10 +36,8 @@ class VisitorForm(forms.ModelForm):
 VisitorQuestionForm = inlineformset_factory(Visitor, VisitorResponse, 
                     extra=0, can_delete=False, fields = "__all__")
 
-class VisitForm(forms.ModelForm):     
-    def __init__(self, *args, **kwargs):
-        super(VisitForm, self).__init__(*args, **kwargs)
-        self.fields["visit_type"].queryset = VisitType.objects.filter(is_selectable=True)
+class VisitForm(forms.ModelForm):
+    visit_type = forms.ModelChoiceField(queryset=VisitType.objects.filter(is_selectable=True))
     
     class Meta:
         model = Visit

@@ -4,7 +4,7 @@
 <fieldset>
     <legend>Referrers</legend>
 
-    <a href="{% url add-referrer %}" class="round-button" style="margin: 5px 10px;">Add Referrer</a>
+    <a href="{% url 'add-referrer' %}" class="round-button" style="margin: 5px 10px;">Add Referrer</a>
 
     <table class="data-table">
         <thead>
@@ -24,8 +24,8 @@
                     <td>{{ referrer.email }}</td>
                     <td>{{ referrer.referral_set.count }}</td>
                     <td>
-<a href="{% url edit-referrer referrer.id%}">Edit</a> | 
-<form action="{% url delete-referrer %}" id="delete-referrer-{{ referrer.id }}" method="POST" style="display: inline;">
+<a href="{% url 'edit-referrer' referrer.id%}">Edit</a> | 
+<form action="{% url 'delete-referrer' %}" id="delete-referrer-{{ referrer.id }}" method="POST" style="display: inline;">
     {% csrf_token %}
     <input type="hidden" name="id" value="{{ referrer.id }}" />
     <a href="#" class="delete-referrer-link" data-formref="delete-referrer-{{referrer.id}}">Delete</a>

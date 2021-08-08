@@ -1,6 +1,7 @@
 import locale # for formatting
 
 import django
+from django.shortcuts import render
 import os
 import datetime
 from datetime import date
@@ -57,8 +58,7 @@ class ReportRenderer(object):
         pass
 
     def __render_to_html(self, template_path, request, data_dict):
-        return render_to_response(template_path, data_dict, 
-                        context_instance=RequestContext(request))
+        return render(request, template_path, data_dict)
 
     def __render_to_csv(self, field_names, data, filename):
         response = HttpResponse(content_type='text/csv')
@@ -67,7 +67,7 @@ class ReportRenderer(object):
         writer = csv.writer(response)
         writer.writerow(field_names)
         for row in data:
-            writer.writerow([unicode(s).encode("ascii", "ignore") if s else "" for s in row])
+            writer.writerow([str(s).encode("ascii", "ignore") if s else "" for s in row])
         
         return response
 
@@ -144,7 +144,7 @@ class ReportRenderer(object):
 
                 
 
-        ethnicity_choices = Visitor._meta.get_field_by_name("ethnicity")[0].choices
+        ethnicity_choices = Visitor._meta.get_field("ethnicity").choices
         ethnicity_vals = [e[1] for e in ethnicity_choices]
         ethnicity_table = TwoWayCountTable(ethnicity_vals, gender_choices)
         ethnicity_map = dict(ethnicity_choices)
@@ -200,9 +200,9 @@ class ReportRenderer(object):
                  "visit_questions" : sorted(visit_questions), 
                  "start_date" : datetime.date(start_date), 
                  "end_date" : datetime.date(end_date),
-                 "visitor_questions" : sorted(visitor_questions.iteritems()),
-                 "visitors_by_id_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_id_town.iteritems()]),
-                 "visitors_by_resid_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_resid_town.iteritems()]),
+                 "visitor_questions" : sorted(visitor_questions.items(), key=lambda x: -x[1]),
+                 "visitors_by_id_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_id_town.items()]),
+                 "visitors_by_resid_town" : sorted([(k, c[0], c[1]) for k, c in visitors_by_resid_town.items()]),
                  "report_header" : ", ".join([v.type for v in visit_types]),
                  "num_veteran_visits" : num_veteran_visits,
                  "num_visiting_veterans" : num_visiting_veterans,

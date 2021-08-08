@@ -31,7 +31,7 @@
         {{ form.email|tabindex:11 }}
 
         <div style="display: block;">
-            <a href="{% url volunteers %}" style="margin-top: 15px" class="round-button">Back to List</a>
+            <a href="{% url 'volunteers' %}" style="margin-top: 15px" class="round-button">Back to List</a>
             <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Volunteer" tabindex="10"/>
         </div>
     </div>
@@ -82,7 +82,7 @@
 
 {% if form.instance.id %}
     <fieldset>
-        <a href="{% url add-participation form.instance.id %}" class="round-button">Add Participation</a>
+        <a href="{% url 'add-participation' form.instance.id %}" class="round-button">Add Participation</a>
         <legend>Participation</legend>
         <table id="part-table">
             <thead>
@@ -102,8 +102,8 @@
                         <td>{{ part.hours}}</td>
                         <td>{{ part.participation_type }}</td>
                         <td>
-                            <a href="{% url edit-participation form.instance.id part.id %}">Edit</a> | 
-                            <a href="{% url delete-participation part.id %}" 
+                            <a href="{% url 'edit-participation' form.instance.id part.id %}">Edit</a> | 
+                            <a href="{% url 'delete-participation' part.id %}" 
                                 onclick="return confirm('Are you sure you want to delete the participation?')">Delete</a>
                         </td>
                    </tr> 

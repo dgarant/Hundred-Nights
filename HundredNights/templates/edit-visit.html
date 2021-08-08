@@ -17,11 +17,12 @@
     }
 </style>
 {% if form.instance.id %}
-<form method="post" action="{% url edit-visit form.instance.visitor.id form.instance.id %}">
+<form method="post" action="{% url 'edit-visit' form.instance.visitor.id form.instance.id %}">
 {% else %}
 <form method="post" action="">
 {% endif %}
     {% csrf_token %}
+    {{ form.errors }}    
     <div class="right">
         {{ responses.management_form }}
         {% for response in responses.forms %}
@@ -44,6 +45,7 @@
     <p style="font-weight: bold;">Visitor: {{ visitor.name }}</p>
 
     {{ form.non_field_errors }}
+    {{ form.visitor.errors }}
     {{ form.visitor }}
 
     <label for="id_visit_type" >Visit Type:</label>
@@ -59,7 +61,7 @@
     {{ form.comment|tabindex:3}}
 
     <div style="display: block">
-        <a href="{% url edit-visitor visitor.id %}" class="round-button">Back to Visitor</a>
+        <a href="{% url 'edit-visitor' visitor.id %}" class="round-button">Back to Visitor</a>
         <input type="submit" value="Save" class="round-button" />
     </div>
     </div>

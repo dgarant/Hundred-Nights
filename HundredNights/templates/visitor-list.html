@@ -9,7 +9,7 @@
 <fieldset>
     <legend>Visitors</legend>
 
-    <a href="{% url add-visitor %}" class="round-button" >Add Visitor</a>
+    <a href="{% url 'add-visitor' %}" class="round-button" >Add Visitor</a>
 
     <table id="visitor-table">
         <thead>
@@ -27,8 +27,8 @@
                 <td>{{visitor.town_of_residence}}</td>
                 <td>{{visitor.town_of_id}}</td>
                 <td>
-                    <a href="{% url edit-visitor visitor.pk %}">Edit</a> | 
-                    <a href="{% url delete-visitor visitor.pk %}" onclick="return confirm('Are you sure you want to delete the visitor?')">Delete</a>
+                    <a href="{% url 'edit-visitor' visitor.pk %}">Edit</a> | 
+                    <a href="{% url 'delete-visitor' visitor.pk %}" onclick="return confirm('Are you sure you want to delete the visitor?')">Delete</a>
                 </td>
             </tr>
         {% endfor %}
@@ -39,7 +39,7 @@
     <br/>
     <br/>
     <br/>
-    <span style="font-weight: bold">Showing only visitors checked in within the last {{ year_filter }} years. <a href="{% url visitors %}">Click to show all visitors instead.</a>
+    <span style="font-weight: bold">Showing only visitors checked in within the last {{ year_filter }} years. <a href="{% url 'visitors' %}">Click to show all visitors instead.</a>
     {% endif %}
 </fieldset>
 

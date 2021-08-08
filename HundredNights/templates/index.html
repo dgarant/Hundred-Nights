@@ -7,7 +7,7 @@
     google.load("visualization", "1", {packages: ["corechart"]});
     google.setOnLoadCallback(drawCharts);
     function drawCharts() {
-        $.getJSON("{% url visits-by-month %}", function(data) {
+        $.getJSON("{% url 'visits-by-month' %}", function(data) {
             var newLength = data.unshift(['Month', 'Visit Count'])
             if(newLength > 1) {
                 var tableData = google.visualization.arrayToDataTable(data)
@@ -23,7 +23,7 @@
             }
         });
 
-        $.getJSON("{% url volunteer-hours-by-month %}", function(data) {
+        $.getJSON("{% url 'volunteer-hours-by-month' %}", function(data) {
             var newLength = data.unshift(['Month', 'Volunteer Hours'])
             if(newLength > 1) {
                 var tableData = google.visualization.arrayToDataTable(data);
@@ -59,13 +59,13 @@
 </div>
 
 
-<form action="{% url visitor-report %}" target="_blank" method="get">
+<form action="{% url 'visitor-report' %}" target="_blank" method="get">
     <input type="submit" class="round-button" value="Run Visitor Report" />
 </form>
 
 <fieldset>
     <legend>Visit Report</legend>
-    <form action="{% url visit-report %}" target="_blank" method="get">
+    <form action="{% url 'visit-report' %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
@@ -86,7 +86,7 @@
 
 <fieldset>
     <legend>Donation Report</legend>
-    <form action="{% url donation-report %}" target="_blank" method="get">
+    <form action="{% url 'donation-report' %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
@@ -114,7 +114,7 @@
 
 <fieldset>
     <legend>Volunteer Report</legend>
-    <form action="{% url participation-report %}" target="_blank" method="get">
+    <form action="{% url 'participation-report' %}" target="_blank" method="get">
 
         <span style="margin: 5px; font-weight: bold;">Format</span>
         <select name="format">
@@ -135,7 +135,7 @@
 
 <fieldset>
     <legend>United Way Report</legend>
-    <form action="{% url united-way-report %}" target="_blank" method="post">
+    <form action="{% url 'united-way-report' %}" target="_blank" method="post">
         
         {% csrf_token %}
        <div style="display: inline-block;">

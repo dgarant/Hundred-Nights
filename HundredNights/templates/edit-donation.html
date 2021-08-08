@@ -25,7 +25,7 @@
         {{ form.comment|tabindex:5 }}
 
         <div style="display: block;">
-            <a href="{% url edit-donor donor.id %}" style="margin: 10px 0px;" class="round-button" tabindex="6">Back to Donor</a>
+            <a href="{% url 'edit-donor' donor.id %}" style="margin: 10px 0px;" class="round-button" tabindex="6">Back to Donor</a>
             <input style="display: block; margin-top: 10px;" class="round-button" type="submit" value="Save Donation" tabindex="7"/>
         </div>
     </div>

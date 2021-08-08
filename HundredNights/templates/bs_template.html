@@ -36,23 +36,23 @@
                 <div id="left-sidebar" class="col-sm-2" style="padding-left: 0px">
                     <ul style="margin-bottom: 0px; padding: 0px">
                         <li>
-                            <a href="{% url visitor-lookup %}">Visitor Lookup</a>
+                            <a href="{% url 'visitor-lookup' %}">Visitor Lookup</a>
                         </li>
                         <li>
-                            <a href="{% url visitors 2 %}">Visitor List</a>
+                            <a href="{% url 'visitors' 2 %}">Visitor List</a>
                         </li>
                         <li>
-                            <a href="{% url volunteers %}">Volunteers</a>
+                            <a href="{% url 'volunteers' %}">Volunteers</a>
                         </li>
                         <li>
-                            <a href="{% url donors %}">Donors</a>
+                            <a href="{% url 'donors' %}">Donors</a>
                         </li>
                         <li>
-                            <a href="{% url referrers %}">Referrals</a>
+                            <a href="{% url 'referrers' %}">Referrals</a>
                         </li>
                         {% if user.is_authenticated %}
                         <li>
-                            <a href="{% url logout %}">Log Out</a>
+                            <a href="{% url 'logout' %}">Log Out</a>
                         </li>
                         {% endif %}
                     </ul>

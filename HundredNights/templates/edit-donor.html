@@ -24,7 +24,7 @@
         {{ form.organization_contact|tabindex:10 }}
 
         <div style="display: block;">
-            <a href="{% url donors %}" style="margin-top: 15px" class="round-button">Back to List</a>
+            <a href="{% url 'donors' %}" style="margin-top: 15px" class="round-button">Back to List</a>
             <input style="display: block; margin-top: 5px;" class="round-button" type="submit" value="Save Donor" tabindex="10"/>
         </div>
     </div>
@@ -64,7 +64,7 @@
 <fieldset style="clear: both;"> 
     <legend>Donations</legend>
 
-    <a href="{% url add-donation form.instance.id %}" id="add-donation-button" class="round-button">Add Donation</a>
+    <a href="{% url 'add-donation' form.instance.id %}" id="add-donation-button" class="round-button">Add Donation</a>
 
     <table class="donation-table">
         <thead>
@@ -86,8 +86,8 @@
                 <td>{{ donation.description }}</td>
                 <td>{{ donation.comment }}</td>
                 <td>
-                    <a href="{% url edit-donation form.instance.id donation.id %}">Edit</a> | 
-                    <a href="{% url delete-donation donation.id %}"
+                    <a href="{% url 'edit-donation' form.instance.id donation.id %}">Edit</a> | 
+                    <a href="{% url 'delete-donation' donation.id %}"
                         onclick="return confirm('Are you sure you want to delete the donation?')">Delete</a>
                 </td>
             </tr>
@@ -125,7 +125,7 @@
 
        $("#add-donation-button").click(function(e) {
             $.ajax({
-                url: "{% url edit-donor form.instance.id %}", 
+                url: "{% url 'edit-donor' form.instance.id %}", 
                 data: $("#donor-form").serialize(),
                 type: "POST",
                 async: false

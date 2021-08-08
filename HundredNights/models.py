@@ -33,13 +33,13 @@ class Donor(models.Model):
     class Meta:
         verbose_name = "Donor"
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     
 class Donation(models.Model):
     """ Represents a monetary sum or an item that has been gifted. """
 
-    donor = models.ForeignKey(Donor, verbose_name="Donor", on_delete=models.PROTECT)
+    donor = models.ForeignKey(Donor, verbose_name="Donor", on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, 
         decimal_places=2, verbose_name="Amount (if monetary)",
         null=True, blank=True)
@@ -56,7 +56,7 @@ class Donation(models.Model):
     class Meta:
         verbose_name = "Donation"
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{0} - {1}".format(self.donor.name, self.date)
     
 class Visitor(models.Model):
@@ -120,8 +120,8 @@ class Visitor(models.Model):
     class Meta:
         verbose_name = "Visitor"
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
 class VisitorQuestion(models.Model):
     """ A question which is recorded for all visitors """
@@ -135,20 +135,20 @@ class VisitorQuestion(models.Model):
     class Meta:
         verbose_name = "Visitor Question"
 
-    def __unicode__(self):
-        return unicode(self.title)
+    def __str__(self):
+        return str(self.title)
 
 class VisitorResponse(models.Model):
     """ A response to a visitor question """
-    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.PROTECT)
+    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.CASCADE)
     question = models.ForeignKey(VisitorQuestion, verbose_name="Question", on_delete=models.PROTECT)
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
 
     class Meta:
         verbose_name = "Visitor Response"
 
-    def __unicode__(self):
-        return unicode(self.visitor) + u" - " + unicode(self.question)
+    def __str__(self):
+        return str(self.visitor) + u" - " + str(self.question)
 
     
 class VisitType(models.Model):
@@ -160,8 +160,8 @@ class VisitType(models.Model):
     class Meta:
         verbose_name = "Visit Type"
 
-    def __unicode__(self):
-        return unicode(self.type)
+    def __str__(self):
+        return str(self.type)
 
 class ParticipationType(models.Model):
     """ A service provided by a shelter volunteer"""
@@ -171,12 +171,12 @@ class ParticipationType(models.Model):
     class Meta:
         verbose_name = "Participation Type"
 
-    def __unicode__(self):
-        return unicode(self.type)
+    def __str__(self):
+        return str(self.type)
 
 class Visit(models.Model):
     """ A stop by a visitor at the shelter """
-    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.PROTECT)
+    visitor = models.ForeignKey(Visitor, verbose_name="Visitor", on_delete=models.CASCADE)
     date = models.DateField(verbose_name="Visit Date", default=datetime.now)
     visit_type = models.ForeignKey(VisitType, verbose_name="Visit Type", on_delete=models.PROTECT)
     comment = models.TextField(verbose_name="Comments", null=True, blank=True)
@@ -184,8 +184,8 @@ class Visit(models.Model):
     class Meta:
         verbose_name = "Visit"
 
-    def __unicode__(self):
-        return unicode(self.visitor)
+    def __str__(self):
+        return str(self.visitor)
 
 class VisitQuestion(models.Model):
     """ A question which is asked every time a visitor stops at the shelter """
@@ -203,12 +203,12 @@ class VisitQuestion(models.Model):
     class Meta:
         verbose_name = "Visit Question"
 
-    def __unicode__(self):
-        return unicode(self.title)
+    def __str__(self):
+        return str(self.title)
 
 class VisitResponse(models.Model):
     """ A response to a question which is asked at every visit """
-    visit = models.ForeignKey(Visit, verbose_name="Visit", on_delete=models.PROTECT)
+    visit = models.ForeignKey(Visit, verbose_name="Visit", on_delete=models.CASCADE)
     question = models.ForeignKey(VisitQuestion, verbose_name="Question", on_delete=models.PROTECT)
     bool_response = models.BooleanField(verbose_name="Did the visitor respond affirmatively?")
     details = models.TextField(verbose_name="Details", null=True, blank=True)
@@ -216,8 +216,8 @@ class VisitResponse(models.Model):
     class Meta:
         verbose_name = "Visit Response"
 
-    def __unicode__(self):
-        return unicode(self.visit) + u" - " + unicode(self.question)
+    def __str__(self):
+        return str(self.visit) + u" - " + str(self.question)
     
 class Volunteer(models.Model):
     """ An individual who donates time to the shelter """
@@ -246,8 +246,8 @@ class Volunteer(models.Model):
     class Meta:
         verbose_name = "Volunteer"
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     
 class VolunteerParticipation(models.Model):
     """ An hourly log of a visitor's stop at the shelter """
@@ -264,7 +264,7 @@ class VolunteerParticipation(models.Model):
     class Meta:
         verbose_name = "Volunteer Participation"
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{0} - {1}".format(volunteer.name, date)
 
 class Referrer(models.Model):
@@ -277,12 +277,12 @@ class Referrer(models.Model):
 
 class Referral(models.Model):
     """ An instance in which a referrer refers some visitors """
-    referrer = models.ForeignKey(Referrer, on_delete=models.PROTECT)
+    referrer = models.ForeignKey(Referrer, on_delete=models.CASCADE)
     date = models.DateField()
     comment = models.TextField(null=True, blank=True)
 
 class ReferralVisitor(models.Model):
     """ Relates a referral to a visitor """
-    referral = models.ForeignKey(Referral, on_delete=models.PROTECT)
+    referral = models.ForeignKey(Referral, on_delete=models.CASCADE)
     visitor = models.ForeignKey(Visitor, on_delete=models.PROTECT)
     visit = models.ForeignKey(Visit, null=True, blank=True, on_delete=models.PROTECT)

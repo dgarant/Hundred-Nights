@@ -294,11 +294,11 @@ def visits_by_month(request):
     except DatabaseError:
         cursor.execute("""
             select 
-                strftime('%%Y-%%m', date) as MonthName,
+                strftime('%Y-%m', date) as MonthName,
                 count(*) as VisitCount
               from "HundredNights_visit"
-                group by strftime('%%Y-%%m', date), MonthName
-                order by strftime('%%Y-%%m', date)
+                group by strftime('%Y-%m', date), MonthName
+                order by strftime('%Y-%m', date)
               """)
     results = cursor.fetchall()
     return HttpResponse(simplejson.dumps(results), 
@@ -322,14 +322,14 @@ def volunteer_hours_by_month(request):
     except DatabaseError: #support either postgres or sqlite with raw SQL
         cursor.execute("""
                     select
-                        strftime('%%Y-%%m', date) as MonthName,
+                        strftime('%Y-%m', date) as MonthName,
                         sum(hours * coalesce(num_participants, 1)) as Hours
                     from "HundredNights_volunteerparticipation"
-                    group by strftime('%%Y-%%m', date), MonthName
-                    order by strftime('%%Y-%%m', date)
+                    group by strftime('%Y-%m', date), MonthName
+                    order by strftime('%Y-%m', date)
                     """)
     results = cursor.fetchall()
-    return HttpResponse(simplejson.dumps(results, use_decimal=True),
+    return HttpResponse(simplejson.dumps(results),
                 content_type='application/json')
 
 @login_required
@@ -351,9 +351,9 @@ def edit_visit(request, visitor_id, visit_id=None):
 
         # attach new questions
         new_questions = [q for q in VisitQuestion.objects.all()
-                 if not q in [r.question for r in visit.visitresponse_set.all()]]
+                 if not q in [r.question for r in visit.visitresponse_set.all()] and q.active]
         for new_question in new_questions:
-            resp = VisitResponse.objects.create(visit=visit, question=new_question)
+            resp = VisitResponse.objects.create(visit=visit, question=new_question, bool_response=False)
 
     except Visit.DoesNotExist:
         form = VisitForm(initial={'visitor' : visitor.pk})
@@ -371,10 +371,9 @@ def edit_visit(request, visitor_id, visit_id=None):
                 return redirect("edit-visitor", visitor_id=visitor_id)
 
             new_questions = [q for q in VisitQuestion.objects.all()
-                    if not q in [r.question for r in new_visit.visitresponse_set.all()]]
+                    if not q in [r.question for r in new_visit.visitresponse_set.all()] and q.active]
             for new_question in new_questions:
-                if new_question.active:
-                    resp = VisitResponse.objects.create(visit=new_visit, question=new_question)
+                resp = VisitResponse.objects.create(visit=new_visit, question=new_question, bool_response=False)
             qforms = VisitQuestionForm(instance=new_visit)
     elif visit_id:
         form = VisitForm(instance=visit, 
@@ -479,7 +478,7 @@ def edit_visitor(request, visitor_id=None):
     alert = None
     try:
         visitor = Visitor.objects.select_related().get(id=visitor_id)
-        visits = visitor.visit_set.select_related("visitquestion_set").all()
+        visits = visitor.visit_set.select_related().all()
         last_check_in = max([v.date for v in visits]) if visits else None
         if not last_check_in is None and last_check_in < (datetime.now()- relativedelta(years=2)).date():
             alert = "It has been over two years since the last check-in. Consider collecting new information."
