@@ -9,6 +9,12 @@ ADMINS = (
     ('Dan Garant', 'dangarant@gmail.com'),
 )
 
+# Additional locations of static files
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(PROJECT_PATH, "config.json"), "r") as handle:
+    config = json.load(handle)
+
 MANAGERS = ADMINS
 
 af_services = os.getenv("VCAP_SERVICES")
@@ -22,11 +28,11 @@ DATABASES = {
     'default': {
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'ENGINE': 'django.db.backends.{0}'.format(
-                    os.environ.get("HNIGHTS_BACKEND", "postgresql_psycopg2")),
-        'NAME': os.environ["HNIGHTS_DBNAME"],                      # Or path to database file if using sqlite3.
+                    config.get("HNIGHTS_BACKEND", "postgresql_psycopg2")),
+        'NAME': config["HNIGHTS_DBNAME"],                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': os.environ["HNIGHTS_DB_USER"],
-        'PASSWORD': os.environ["HNIGHTS_DB_PASS"],
+        'USER': config["HNIGHTS_DB_USER"],
+        'PASSWORD': config["HNIGHTS_DB_PASS"],
         'HOST': host,                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -38,7 +44,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config["HOSTNAME"]]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -84,8 +90,6 @@ STATIC_ROOT = 'staticfiles'
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-# Additional locations of static files
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'static'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -102,7 +106,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ["HNIGHTS_SECRET_KEY"]
+SECRET_KEY = config["HNIGHTS_SECRET_KEY"]
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -175,7 +179,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class' : 'logging.handlers.RotatingFileHandler',
-            'filename': 'applog.txt',
+            'filename': config["LOG_PATH"],
             'maxBytes' : 1024*1024*10, # 10MB
             'backupCount' : 2
         }

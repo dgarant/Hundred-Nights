@@ -13,4 +13,5 @@ rootkey.csv
 applog.txt
 .ipynb_checkpoints
 *.ipynb
+config.json
 
