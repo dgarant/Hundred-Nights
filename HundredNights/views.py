@@ -17,6 +17,7 @@ from django.http import HttpResponse
 import django
 from HundredNights.report_renderer import ReportRenderer
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
 import csv, sys, os
 import json as simplejson

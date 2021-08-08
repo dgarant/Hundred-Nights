@@ -9,8 +9,8 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^$', index, name='index'),
-    url(r'^accounts/login/$', LoginView.as_view(template_name='registration/login.html')),
-    url(r'^accounts/logout/$', LogoutView, {"next_page" : "/"}, name="logout"),
+    url(r'^accounts/login/$', LoginView.as_view(template_name='registration/login.html'), name='login'),
+    url(r'^accounts/logout/$', LogoutView.as_view(template_name='registration/logout.html'), {"next_page" : "/"}, name="logout"),
 
     # report creation functions
     url(r'visitor-report/$', visitor_report, name='visitor-report'),
