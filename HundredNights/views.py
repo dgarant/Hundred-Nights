@@ -20,7 +20,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
 import csv, sys, os
-import json as simplejson
+import decimal
+import json
+
+class HNEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        return super(HNEncoder, self).default(o)
 
 @login_required
 def index(request):
@@ -116,7 +123,7 @@ def visitor_filter(request):
     end_date = request.POST.get("end_date", None)
     visit_type_ids = request.POST.getlist("visit_types", None)
     if not start_date or not end_date or not visit_type_ids:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Missing one or more required parameters. " + 
                     "Expected question_id, start_date, end_date, and visit_type"}), 
@@ -125,7 +132,7 @@ def visitor_filter(request):
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
     except Exception as ex:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Failed to parse a supplied date. " + 
                              "Message was {0}.".format(ex)}),
@@ -188,7 +195,7 @@ def visitor_filter(request):
                     town_match(v.visitor.town_of_residence, town_of_resid_filter)):
                 visitors.append({"name" : v.visitor.name, "id" : v.visitor.id})
 
-    return HttpResponse(simplejson.dumps(
+    return HttpResponse(json.dumps(
                 {
                     "result" : "success", 
                     "respondents" : sorted(visitors, key=lambda x: x["name"])
@@ -203,7 +210,7 @@ def visitor_respondents(request):
     affirmative_resp = request.POST.get("response_type", "true").lower()[0] == "t"
     visit_type_ids = request.POST.getlist("visit_types", None)
     if not question_id or not start_date or not end_date or not visit_type_ids:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Missing one or more required parameters. " + 
                     "Expected question_id, start_date, end_date, and visit_type"}), 
@@ -212,7 +219,7 @@ def visitor_respondents(request):
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
     except Exception as ex:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Failed to parse a supplied date. " + 
                              "Message was {0}.".format(ex)}),
@@ -229,11 +236,12 @@ def visitor_respondents(request):
         if response.visitor.id in visitors_in_window:
             respondents.append({"name" : response.visitor.name, 
                                 "id" : response.visitor.id })
-    return HttpResponse(simplejson.dumps(
+    return HttpResponse(json.dumps(
                 {
                     "result" : "success", 
                     "respondents" : respondents
-                 }), content_type="application/json")
+                 }, cls=HNEncoder),
+            content_type="application/json")
 
 @login_required
 @csrf_protect
@@ -244,7 +252,7 @@ def visit_respondents(request):
     affirmative_resp = request.POST.get("response_type", "true").lower()[0] == "t"
     visit_types = request.POST.getlist("visit_types", None)
     if not question_id or not start_date or not end_date or not visit_types:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Missing one or more required parameters. " + 
                     "Expected question_id, start_date, end_date, and visit_type"}), 
@@ -253,7 +261,7 @@ def visit_respondents(request):
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
     except ex:
-        return HttpResponse(simplejson.dumps(
+        return HttpResponse(json.dumps(
                 {"result" : "error", 
                  "message" : "Failed to parse a supplied date. " + 
                              "Message was {0}.".format(ex)}),
@@ -272,11 +280,11 @@ def visit_respondents(request):
             respondents.append({"name" : response.visit.visitor.name, 
                                 "visitorid" : response.visit.visitor.id,
                                 "id" : response.visit.id })
-    return HttpResponse(simplejson.dumps(
+    return HttpResponse(json.dumps(
                 {
                     "result" : "success", 
                     "respondents" : respondents
-                }), content_type="application/json")
+                }, cls=HNEncoder), content_type="application/json")
 
 @login_required
 def visits_by_month(request):
@@ -302,7 +310,7 @@ def visits_by_month(request):
                 order by strftime('%Y-%m', date)
               """)
     results = cursor.fetchall()
-    return HttpResponse(simplejson.dumps(results), 
+    return HttpResponse(json.dumps(results, cls=HNEncoder), 
             content_type='application/json')
 
 @login_required
@@ -330,7 +338,7 @@ def volunteer_hours_by_month(request):
                     order by strftime('%Y-%m', date)
                     """)
     results = cursor.fetchall()
-    return HttpResponse(simplejson.dumps(results),
+    return HttpResponse(json.dumps(results, cls=HNEncoder),
                 content_type='application/json')
 
 @login_required
@@ -446,11 +454,11 @@ def visitor_search_api(request):
     else:
         results = vobjs.objects.all()
 
-    return HttpResponse(simplejson.dumps([{
+    return HttpResponse(json.dumps([{
                 "name" : v.name, "town_of_residence" : v.town_of_residence, 
                 "town_of_id" : v.town_of_id, "id" : v.id, 
                 "latest_check_in" : v.visit__date__max.isoformat() if v.visit__date__max else None} 
-                    for v in results]),
+                    for v in results], cls=HNEncoder),
                  content_type="application/json")
 
 @login_required
@@ -488,7 +496,7 @@ def edit_visitor(request, visitor_id=None):
         new_questions = [q for q in VisitorQuestion.objects.all() 
                         if not q in [r.question for r in visitor.visitorresponse_set.all()]]
         for new_question in new_questions:
-            resp = VisitorResponse.objects.create(visitor=visitor, question=new_question)
+            resp = VisitorResponse.objects.create(visitor=visitor, question=new_question, bool_response=False)
     except Visitor.DoesNotExist:
         form = VisitorForm()
         qforms = VisitorQuestionForm()
