@@ -514,7 +514,7 @@ def edit_visitor(request, visitor_id=None):
                             if not q in [r.question for r in new_visitor.visitorresponse_set.all()]]
             for new_question in new_questions:
                 resp = VisitorResponse.objects.create(
-                        visitor=new_visitor, question=new_question)
+                        visitor=new_visitor, question=new_question, bool_response=False)
             qforms = VisitorQuestionForm(instance=new_visitor)
     elif visitor_id:
         form = VisitorForm(instance=visitor)
