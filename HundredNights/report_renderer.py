@@ -197,7 +197,7 @@ class ReportRenderer(object):
         return self.__render_to_html("united_way_report.html", request,
                 {"num_unique_visitors" : num_unique_visitors,
                 "total_visits" : overall_total_visits,
-                 "visit_questions" : sorted(visit_questions), 
+                 "visit_questions" : sorted(visit_questions, key=lambda x: -x[1]), 
                  "start_date" : datetime.date(start_date), 
                  "end_date" : datetime.date(end_date),
                  "visitor_questions" : sorted(visitor_questions.items(), key=lambda x: -x[1]),
