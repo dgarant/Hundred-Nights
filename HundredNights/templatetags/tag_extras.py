@@ -2,6 +2,7 @@
 from django import template
 import calendar
 import locale
+import datetime
 
 register = template.Library()
 
@@ -15,6 +16,13 @@ def currency(dollars):
         return ""
     locale.setlocale(locale.LC_ALL, '')
     return locale.currency(float(dollars), grouping=True)
+
+@register.filter
+def age_years(birth_dt):
+    if birth_dt:
+        return int((datetime.date.today() - birth_dt).days / 365.2425)
+    else:
+        return "-"
 
 @register.filter
 def bool_yn(bool_val):

@@ -67,7 +67,7 @@ class ReportRenderer(object):
         writer = csv.writer(response)
         writer.writerow(field_names)
         for row in data:
-            writer.writerow([str(s).encode("ascii", "ignore") if s else "" for s in row])
+            writer.writerow([str(s).encode("ascii", "ignore").decode() if s else "" for s in row])
         
         return response
 
@@ -183,11 +183,13 @@ class ReportRenderer(object):
                 if curr_age in age_map:
                     age_table.add(age_map[curr_age], gender_label)
 
-            unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
-            visitors_by_id_town[visitor.town_of_id.upper().strip()] = [unique_visits+1, total_visits+num_visits]
+            if visitor.town_of_id:
+                unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
+                visitors_by_id_town[visitor.town_of_id.upper().strip()] = [unique_visits+1, total_visits+num_visits]
 
-            unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper().strip()]
-            visitors_by_resid_town[visitor.town_of_residence.upper().strip()] = [unique_visits+1, total_visits+num_visits]
+            if visitor.town_of_residence:
+                unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper().strip()]
+                visitors_by_resid_town[visitor.town_of_residence.upper().strip()] = [unique_visits+1, total_visits+num_visits]
 
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 

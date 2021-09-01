@@ -11,12 +11,12 @@
                 <th>Veteran</th>
                 <th>Overnight</th>
                 <th>Resource Center</th>
-                <th>Other</th>
+                <th>Case Management</th>
             </tr>
             {% for visitor, counts in visit_dict.items %}
             <tr>
                 <td>{{ visitor.name }}</td>
-                <td>{{ visitor.age|replace_none:"-"  }}</td>
+                <td>{{ visitor.date_of_birth|age_years  }}</td>
                 <td>{{ visitor.veteran|bool_yn  }}</td>
                 <td>{{ counts.0  }}</td>
                 <td>{{ counts.1  }}</td>
