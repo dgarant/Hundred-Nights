@@ -181,7 +181,7 @@ def visitor_filter(request):
 
     def town_match(town, town_filter):
         return (town_filter is None or 
-                town.upper().strip() == town_filter.upper().strip())
+                (town is not None and town.upper().strip() == town_filter.upper().strip()))
 
     visitors = []
     saw_visitor_ids = set()
@@ -438,6 +438,24 @@ def visitor_check_in_overnight(request, visitor_id):
     visit.visitor = visitor
     visit.date = datetime.now()
     visit.visit_type = VisitType.objects.get(type="Overnight")
+    visit.save()
+    return redirect('edit-visit', visitor_id=visitor_id, visit_id=visit.id)
+
+@login_required
+def visitor_check_in_case_management(request, visitor_id):
+    """ Adds a case management visit for the 
+        specified visitor on the current date
+
+        Keyword arguments:
+            visitor_id -- The primary key of the visitor 
+                            to log a new visit for
+        Returns a view of the visitor with the newly added visit
+    """
+    visitor = Visitor.objects.get(id=visitor_id)
+    visit = Visit()
+    visit.visitor = visitor
+    visit.date = datetime.now()
+    visit.visit_type = VisitType.objects.get(type="Case Management")
     visit.save()
     return redirect('edit-visit', visitor_id=visitor_id, visit_id=visit.id)
 

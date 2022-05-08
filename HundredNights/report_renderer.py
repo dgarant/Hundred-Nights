@@ -183,13 +183,13 @@ class ReportRenderer(object):
                 if curr_age in age_map:
                     age_table.add(age_map[curr_age], gender_label)
 
-            if visitor.town_of_id:
-                unique_visits, total_visits = visitors_by_id_town[visitor.town_of_id.upper().strip()]
-                visitors_by_id_town[visitor.town_of_id.upper().strip()] = [unique_visits+1, total_visits+num_visits]
+            town_of_id = visitor.town_of_id.upper().strip() if visitor.town_of_id else "NONE"
+            unique_visits, total_visits = visitors_by_id_town[town_of_id]
+            visitors_by_id_town[town_of_id] = [unique_visits+1, total_visits+num_visits]
 
-            if visitor.town_of_residence:
-                unique_visits, total_visits = visitors_by_resid_town[visitor.town_of_residence.upper().strip()]
-                visitors_by_resid_town[visitor.town_of_residence.upper().strip()] = [unique_visits+1, total_visits+num_visits]
+            town_of_residence = visitor.town_of_residence.upper().strip() if visitor.town_of_residence else "NONE"
+            unique_visits, total_visits = visitors_by_resid_town[town_of_residence]
+            visitors_by_resid_town[town_of_residence] = [unique_visits+1, total_visits+num_visits]
 
             for response in visitor.visitorresponse_set.filter(
                             question__id__in = question_ids, 

@@ -45,6 +45,7 @@ urlpatterns = [
 
     url(r'^resource-check-in/(?P<visitor_id>\d{1,10})$', visitor_check_in_resource, name='resource-check-in'),
     url(r'^overnight-check-in/(?P<visitor_id>\d{1,10})$', visitor_check_in_overnight, name='overnight-check-in'),
+    url(r'^case-management-check-in/(?P<visitor_id>\d{1,10})$', visitor_check_in_case_management, name='case-management-check-in'),
 
     # volunteer-related functions
     url(r'^volunteers/$', volunteers, name='volunteers'),

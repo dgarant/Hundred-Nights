@@ -42,6 +42,9 @@
         <div style="display: block">
             <a href="{% url 'overnight-check-in' form.instance.id %}" class="round-button">Check In - Overnight</a>
         </div>
+        <div style="display: block">
+            <a href="{% url 'case-management-check-in' form.instance.id %}" class="round-button">Check In - Case Management</a>
+        </div>
         {% endif %}
         <div style="display: block">
                 <a href="{% url 'visitors' %}" style="margin-top: 15px" class="round-button">Back to List</a>
